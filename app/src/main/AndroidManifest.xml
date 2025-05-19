@@ -13,6 +13,63 @@
         android:theme="@style/Theme.BudgetBeatersPOE"
         tools:targetApi="31">
         <activity
+            android:name=".ViewExpenses"
+            android:exported="false" />
+        <activity
+            android:name=".ViewAllSpendingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ViewAllExpensesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SharedBudgetingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ResetPassword"
+            android:exported="false" />
+        <activity
+            android:name=".RemoveExpenseActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RemoveCategoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ProgressDashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PieChartActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MenuActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ForgotPassActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CategoryIncomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CategoriesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".BudgetingGuidesFragment"
+            android:exported="false" />
+        <activity
+            android:name=".AwardsFragment"
+            android:exported="false" />
+        <activity
+            android:name=".AddExpenseActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AddCategoryActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
