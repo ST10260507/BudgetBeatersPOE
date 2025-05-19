@@ -58,12 +58,6 @@
             android:name=".CategoriesActivity"
             android:exported="false" />
         <activity
-            android:name=".BudgetingGuidesFragment"
-            android:exported="false" />
-        <activity
-            android:name=".AwardsFragment"
-            android:exported="false" />
-        <activity
             android:name=".AddExpenseActivity"
             android:exported="false" />
         <activity
