@@ -5,6 +5,227 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bb_marble"
     tools:context=".ViewExpenses">
+
+    <!-- ImageView for the header image, centered at the top -->
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="0dp"
+        android:layout_height="190dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/black_squiggle" />
+
+    <!-- TextView for the title "VIEW EXPENSES" -->
+    <TextView
+        android:id="@+id/ViewExpenses"
+        android:layout_width="250dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:text="VIEW EXPENSES"
+        android:textColor="@android:color/white"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.434"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Background image with a gradient curve, positioned under the title -->
+    <ImageView
+        android:id="@+id/gradientCurvedBg"
+        android:layout_width="492dp"
+        android:layout_height="669dp"
+        android:layout_marginTop="120dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.79"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/gradient_curved_bg" />
+
+    <!-- TextView prompting user to choose a date -->
+    <TextView
+        android:id="@+id/ChooseDateTxt"
+        android:layout_width="331dp"
+        android:layout_height="33dp"
+        android:layout_marginTop="32dp"
+        android:text="PLEASE CHOOSE A DATE PERIOD"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        android:textStyle="italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/gradientCurvedBg" />
+
+    <!-- Horizontal line below the date selection text -->
+    <ImageView
+        android:id="@+id/lineView"
+        android:layout_width="397dp"
+        android:layout_height="10dp"
+        android:layout_marginTop="184dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/white_line" />
+
+    <!-- TextView label for "FROM:" date selection -->
+    <TextView
+        android:id="@+id/fromTxt"
+        android:layout_width="155dp"
+        android:layout_height="28dp"
+        android:layout_marginTop="8dp"
+        android:text="FROM:"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.101"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ChooseDateTxt" />
+
+    <!-- EditText for selecting the "FROM" date -->
+    <EditText
+        android:id="@+id/FromDateInput"
+        android:layout_width="175dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/edit_text_bg"
+        android:clickable="true"
+        android:focusable="false"
+        android:hint="SELECT DATE"
+        android:importantForAccessibility="yes"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.099"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fromTxt" />
+
+    <!-- TextView label for "TO:" date selection -->
+    <TextView
+        android:id="@+id/toTxt"
+        android:layout_width="155dp"
+        android:layout_height="28dp"
+        android:layout_marginTop="8dp"
+        android:text="TO:"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.898"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ChooseDateTxt" />
+
+    <!-- EditText for selecting the "TO" date -->
+    <EditText
+        android:id="@+id/ToDateInput"
+        android:layout_width="175dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/edit_text_bg"
+        android:clickable="true"
+        android:focusable="false"
+        android:hint="SELECT DATE"
+        android:importantForAccessibility="yes"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.885"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toTxt" />
+
+    <!-- Submit button for the user to submit the date range -->
+    <Button
+        android:id="@+id/submitBtn"
+        android:layout_width="125dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="56dp"
+        android:background="@drawable/white_button_border"
+        android:text="SUBMIT"
+        android:textColor="#FF00CC"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toTxt" />
+
+    <!-- Button to view all expenses -->
+    <Button
+        android:id="@+id/ViewAllBtn"
+        android:layout_width="249dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/white_button_border"
+        android:text="VIEW ALL EXPENSES"
+        android:textColor="#FF00CC"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/submitBtn" />
+
+    <!-- TextView indicating an "OR" option for alternate actions -->
+    <TextView
+        android:id="@+id/orTxt"
+        android:layout_width="75dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="12dp"
+        android:text="OR:"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.077"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/submitBtn" />
+
+    <!-- ScrollView containing a RecyclerView for listing expenses -->
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/ViewAllBtn"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- RecyclerView for displaying a list of expenses -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/expensesRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- FrameLayout to hold any fragment content -->
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <!-- BottomNavigationView for the app's bottom navigation menu -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/windowBackground"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:menu="@menu/bottom_nav_menu"
+        app:labelVisibilityMode="labeled" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

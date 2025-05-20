@@ -8,9 +8,13 @@ android {
     namespace = "vcmsa.projects.budgetbeaterspoe"
     compileSdk = 35
 
+    buildFeatures {
+        viewBinding = true
+    }
+
     defaultConfig {
         applicationId = "vcmsa.projects.budgetbeaterspoe"
-        minSdk = 24
+        minSdk = 28
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"

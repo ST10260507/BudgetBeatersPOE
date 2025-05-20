@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/Menu"
+        android:title="Menu"
+        android:icon="@drawable/menu" />
+
+    <item
+        android:id="@+id/BudgetingGuides"
+        android:title="Guides"
+        android:icon="@drawable/guides" />
+
+    <item
+        android:id="@+id/Awards"
+        android:title="Awards"
+        android:icon="@drawable/awards" />
+
+    <item
+        android:id="@+id/Logout"
+        android:title="Logout"
+        android:icon="@drawable/logout" />
+
+</menu>

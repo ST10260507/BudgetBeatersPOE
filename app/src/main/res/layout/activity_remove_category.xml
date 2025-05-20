@@ -5,6 +5,171 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RemoveCategoryActivity">
+    tools:context=".RemoveCategoryActivity"
+    android:background="@drawable/bb_marble">
+
+    <!-- This is the root container for the layout, which includes a background and various UI elements -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Image view for a decorative element (black squiggle) -->
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="413dp"
+            android:layout_height="278dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/black_squiggle" />
+
+        <!-- Main title for the activity, prominently displays "REMOVE A CATEGORY" -->
+        <TextView
+            android:id="@+id/RemoveCategoryTxt"
+            android:layout_width="273dp"
+            android:layout_height="161dp"
+            android:layout_marginTop="40dp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:text="REMOVE A CATEGORY"
+            android:textColor="@android:color/white"
+            android:textSize="40sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Decorative gradient curved background image -->
+        <ImageView
+            android:id="@+id/gradientCurvedBg"
+            android:layout_width="492dp"
+            android:layout_height="669dp"
+            android:layout_marginTop="200dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.777"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/gradient_curved_bg" />
+
+        <!-- Subtitle text asking the user to select a category to remove -->
+        <TextView
+            android:id="@+id/Title"
+            android:layout_width="300dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="40dp"
+            android:gravity="center"
+            android:text="SELECT A CATEGORY TO REMOVE"
+            android:textStyle="italic"
+            android:textColor="@android:color/white"
+            android:textSize="22sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.487"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/RemoveCategoryTxt" />
+
+        <!-- White line separating the title and the category selection -->
+        <ImageView
+            android:id="@+id/lineView"
+            android:layout_width="410dp"
+            android:layout_height="10dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/Title"
+            app:srcCompat="@drawable/white_line" />
+
+        <!-- Spinner for selecting a category from available options -->
+        <Spinner
+            android:id="@+id/categoriesSpinner"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/white_button_border"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lineView" />
+
+        <!-- White line separating the category spinner and the confirmation text -->
+        <ImageView
+            android:id="@+id/lineView2"
+            android:layout_width="410dp"
+            android:layout_height="10dp"
+            android:layout_marginTop="36dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/categoriesSpinner"
+            app:srcCompat="@drawable/white_line" />
+
+        <!-- Confirmation text asking the user if they are sure about removing the category -->
+        <TextView
+            android:id="@+id/RemoveCategoryCONFIRMtxt"
+            android:layout_width="312dp"
+            android:layout_height="64dp"
+            android:layout_marginTop="36dp"
+            android:gravity="center"
+            android:text="ARE YOU SURE YOU WANT TO REMOVE THIS CATEGORY?"
+            android:textColor="@android:color/holo_red_dark"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.494"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lineView2" />
+
+        <!-- "Yes" button to confirm category removal -->
+        <Button
+            android:id="@+id/ConfirmDelBtn"
+            android:layout_width="106dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/neon_blue_button"
+            android:text="Yes"
+            android:textColor="@android:color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.193"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/RemoveCategoryCONFIRMtxt" />
+
+        <!-- "No" button to cancel the category removal -->
+        <Button
+            android:id="@+id/CancelDelBtn"
+            android:layout_width="106dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/neon_pink_button"
+            android:text="No"
+            android:textColor="@android:color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.839"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/RemoveCategoryCONFIRMtxt" />
+
+        <!-- Container for fragments (if any are used in the activity) -->
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <!-- Bottom navigation bar with menu items -->
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigationView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/windowBackground"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:menu="@menu/bottom_nav_menu"
+            app:labelVisibilityMode="labeled" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

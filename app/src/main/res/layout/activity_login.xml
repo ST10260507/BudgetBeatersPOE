@@ -5,6 +5,183 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bb_marble"
     tools:context=".LoginActivity">
+
+    <!-- Top decorative image -->
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="420dp"
+        android:layout_height="269dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/black_squiggle" />
+
+    <!-- LOGIN title text -->
+    <TextView
+        android:id="@+id/Logintxt"
+        android:text="LOGIN"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:textColor="@android:color/white"
+        android:textSize="48sp"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Gradient background behind the form -->
+    <ImageView
+        android:id="@+id/gradientCurvedBg"
+        android:layout_width="492dp"
+        android:layout_height="669dp"
+        android:layout_marginTop="240dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.777"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/gradient_curved_bg" />
+
+    <!-- Input field for user name -->
+    <EditText
+        android:id="@+id/LoginNameInput"
+        android:layout_width="190dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="372dp"
+        android:background="@drawable/edit_text_bg"
+        android:hint="ENTER NAME"
+        android:inputType="textPersonName"
+        android:padding="10dp"
+        android:textColor="@android:color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/LoginNametxt"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Input field for password -->
+    <EditText
+        android:id="@+id/PasswordInput"
+        android:layout_width="189dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/edit_text_bg"
+        android:hint="ENTER PASSWORD"
+        android:inputType="textPassword"
+        android:padding="10dp"
+        android:textColor="@android:color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/Passwordtxt" />
+
+    <!-- Button to trigger login action -->
+    <Button
+        android:id="@+id/LoginBtn"
+        android:layout_width="189dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/login_button_colour"
+        android:text="LOGIN"
+        android:textColor="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.504"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/PasswordInput" />
+
+    <!-- Decorative white line below login button -->
+    <ImageView
+        android:id="@+id/BottomLineView"
+        android:layout_width="410dp"
+        android:layout_height="10dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/LoginBtn"
+        app:srcCompat="@drawable/white_line" />
+
+    <!-- Button to reset password -->
+    <Button
+        android:id="@+id/ForgotPasswordBtn"
+        android:layout_width="189dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/neon_pink_button"
+        android:text="RESET PASSWORD"
+        android:textColor="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.504"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/BottomLineView" />
+
+    <!-- Button to navigate to registration screen -->
+    <Button
+        android:id="@+id/RegisterBtn"
+        android:layout_width="189dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/neon_blue_button"
+        android:text="REGISTER ME"
+        android:textColor="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.504"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ForgotPasswordBtn" />
+
+    <!-- Welcome instruction text -->
+    <TextView
+        android:id="@+id/LoginWelcomeTxt"
+        android:layout_width="175dp"
+        android:layout_height="60dp"
+        android:text="SIGN IN TO CONTINUE"
+        android:textColor="@android:color/white"
+        android:textSize="25sp"
+        android:textStyle="italic"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imageView"/>
+
+    <!-- Decorative white line below welcome text -->
+    <ImageView
+        android:id="@+id/lineView"
+        android:layout_width="410dp"
+        android:layout_height="10dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/LoginWelcomeTxt"
+        app:srcCompat="@drawable/white_line" />
+
+    <!-- Label for name input field -->
+    <TextView
+        android:id="@+id/LoginNametxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="NAME"
+        android:textColor="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.261"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lineView" />
+
+    <!-- Label for password input field -->
+    <TextView
+        android:id="@+id/Passwordtxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="PASSWORD"
+        android:textColor="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.287"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/LoginNameInput" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
