@@ -12,13 +12,14 @@
     <!-- Top Banner ImageView -->
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="0dp"
-        android:layout_height="190dp"
-        android:scaleType="centerCrop"
+        android:layout_width="wrap_content"
+        android:layout_height="130dp"
+        android:layout_marginTop="0dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/black_squiggle" />
+        app:srcCompat="@drawable/IslamicLabel" />
 
     <!-- Gradient Curved Background ImageView -->
     <ImageView
@@ -35,15 +36,15 @@
     <!-- Main Title TextView: View Daily Spending -->
     <TextView
         android:id="@+id/ViewAllSpendingtxt"
-        android:layout_width="0dp"
+        android:layout_width="400dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginHorizontal="1dp"
+        android:layout_marginTop="36dp"
         android:fontFamily="sans-serif-medium"
         android:gravity="center"
         android:text="VIEW DAILY SPENDING"
         android:textColor="@android:color/white"
-        android:textSize="40sp"
+        android:textSize="35sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -59,7 +60,7 @@
         android:textStyle="italic"
         android:text="SELECT A TIME PERIOD:"
         android:textColor="@android:color/white"
-        android:textSize="20sp"
+        android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/gradientCurvedBg" />
@@ -70,7 +71,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="88dp"
         android:text="FROM:"
         android:textColor="@android:color/white"
         android:textSize="16sp"
@@ -138,12 +139,13 @@
         android:id="@+id/CHOOSEDATEtxt3"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="72dp"
+        android:layout_marginTop="80dp"
         android:gravity="center"
         android:text="DAILY SPENDING OVER TIME PERIOD"
         android:textStyle="italic"
         android:textColor="@android:color/white"
         android:textSize="18sp"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"

@@ -18,14 +18,14 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/title_banner" />
+        app:srcCompat="@drawable/IslamicLabel" />
 
     <!-- Title text for the Remove Expenses screen -->
     <TextView
         android:id="@+id/RemoveExpensetxt"
-        android:layout_width="300dp"
+        android:layout_width="400dp"
         android:layout_height="100dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="15dp"
         android:fontFamily="sans-serif-medium"
         android:gravity="center"
         android:text="REMOVE EXPENSES"

@@ -11,7 +11,7 @@
     <!-- Background and Decorative Images -->
 
     <ImageView
-        android:id="@+id/titleBg"
+        android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="130dp"
         android:layout_marginTop="0dp"
@@ -19,7 +19,7 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/title_banner" />
+        app:srcCompat="@drawable/IslamicLabel"/>
 
     <TextView
         android:id="@+id/ProgressDashboardtxt"
@@ -30,7 +30,7 @@
         android:gravity="center"
         android:text="VIEW PROGRESS DASHBOARD"
         android:textColor="@android:color/white"
-        android:textSize="30sp"
+        android:textSize="25sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"

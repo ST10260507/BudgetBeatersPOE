@@ -11,25 +11,26 @@
     <!-- Image for the header with a squiggle design -->
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="0dp"
-        android:layout_height="200dp"
-        android:scaleType="centerCrop"
+        android:layout_width="wrap_content"
+        android:layout_height="130dp"
+        android:layout_marginTop="0dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/black_squiggle" />
+        app:srcCompat="@drawable/IslamicLabel" />
 
     <!-- Title text for the activity -->
     <TextView
         android:id="@+id/ViewAllExpensestxt"
-        android:layout_width="273dp"
-        android:layout_height="161dp"
-        android:layout_marginTop="16dp"
+        android:layout_width="400dp"
+        android:layout_height="61dp"
+        android:layout_marginTop="30dp"
         android:fontFamily="sans-serif-medium"
         android:gravity="center"
         android:text="VIEW ALL EXPENSES"
         android:textColor="@android:color/white"
-        android:textSize="40sp"
+        android:textSize="35sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,7 +41,7 @@
         android:id="@+id/gradientCurvedBg"
         android:layout_width="492dp"
         android:layout_height="669dp"
-        android:layout_marginTop="168dp"
+        android:layout_marginTop="98dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.654"
         app:layout_constraintStart_toStartOf="parent"
@@ -67,7 +68,7 @@
         android:id="@+id/lineview3"
         android:layout_width="410dp"
         android:layout_height="10dp"
-        android:layout_marginTop="264dp"
+        android:layout_marginTop="194dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"

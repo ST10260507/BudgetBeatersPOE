@@ -11,19 +11,21 @@
     <!-- Image at the top of the layout (Logo or graphic) -->
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="400dp"
-        android:layout_height="250dp"
+        android:layout_width="wrap_content"
+        android:layout_height="130dp"
+        android:layout_marginTop="0dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/black_squiggle" />
+        app:srcCompat="@drawable/IslamicLabel" />
 
     <!-- Main header text for registration -->
     <TextView
         android:id="@+id/Registertxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="36dp"
         android:text="REGISTER"
         android:textColor="@android:color/white"
         android:textSize="35sp"
@@ -39,7 +41,7 @@
         android:id="@+id/gradientCurvedBg"
         android:layout_width="492dp"
         android:layout_height="700dp"
-        android:layout_marginTop="175dp"
+        android:layout_marginTop="80dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
