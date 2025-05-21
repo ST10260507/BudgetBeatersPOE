@@ -12,24 +12,24 @@
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
-        android:layout_height="130dp"
+        android:layout_height="100dp"
         android:layout_marginTop="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/IslamicLabel" />
+        app:srcCompat="@drawable/islamic_label" />
 
     <TextView
         android:id="@+id/BudgetGuides"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="27dp"
         android:fontFamily="sans-serif-medium"
         android:gravity="center"
         android:text="BUDGETING GUIDES"
         android:textColor="@android:color/white"
-        android:textSize="35sp"
+        android:textSize="32sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,7 +37,7 @@
 
     <ImageView
         android:id="@+id/gradient_curved_bg"
-        android:layout_width="492dp"
+        android:layout_width="602dp"
         android:layout_height="669dp"
         android:layout_marginTop="90dp"
         app:layout_constraintEnd_toEndOf="parent"

@@ -18,7 +18,7 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/IslamicLabel"/>
+        app:srcCompat="@drawable/islamic_label"/>
 
     <!-- Background curved decorative image to enhance UI -->
     <ImageView
@@ -42,14 +42,14 @@
         android:layout_height="wrap_content"
         android:text="MENU"
         android:textColor="@android:color/white"
-        android:textSize="48sp"
+        android:textSize="40sp"
         android:textStyle="bold"
         android:fontFamily="sans-serif-medium"
         android:gravity="center"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="30dp" />
+        android:layout_marginTop="36dp" />
 
     <!-- Button to navigate to Pie Chart screen -->
     <Button

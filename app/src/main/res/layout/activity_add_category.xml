@@ -17,7 +17,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/IslamicLabel" />
+        app:srcCompat="@drawable/islamic_label" />
 
     <!-- Title text for the page: "ADD CATEGORY" -->
     <TextView
