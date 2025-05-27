@@ -9,136 +9,137 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.firestore.FirebaseFirestore
 import vcmsa.projects.budgetbeaterspoe.databinding.ActivityRemoveCategoryBinding
-import kotlinx.coroutines.launch
 
-// Activity to handle category removal
 class RemoveCategoryActivity : AppCompatActivity() {
-    // Initialize variables
     private lateinit var binding: ActivityRemoveCategoryBinding
-    private var selectedCategoryId: Int? = null // Stores the ID of the selected category
-    private var categoryMap = mutableMapOf<String, Int>() // Map to store category names and IDs
 
-    // Called when the activity is created
+    // Firestore instance
+    private val firestore = FirebaseFirestore.getInstance()
+
+    // Map to store category names to Firestore document IDs
+    private var categoryMap = mutableMapOf<String, String>()
+
+    // Selected Firestore document ID of the category to delete
+    private var selectedCategoryId: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityRemoveCategoryBinding.inflate(layoutInflater) // Bind the layout
-        setContentView(binding.root) // Set the activity layout
-        enableEdgeToEdge() // Enable edge-to-edge display
+        binding = ActivityRemoveCategoryBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        enableEdgeToEdge()
 
-        loadCategories() // Load the categories from the database
-        setupButtons() // Setup the buttons (Confirm and Cancel)
+        loadCategories()
+        setupButtons()
 
-        // Set listener for window insets to adjust padding for system bars
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets // Return the insets
+            insets
         }
 
-        setupBottomNav() // Setup the bottom navigation view
+        setupBottomNav()
     }
 
-    // Load categories from the database and populate the spinner
     private fun loadCategories() {
-        lifecycleScope.launch {
-            val database = AppDatabase.getDatabase(applicationContext) // Get database instance
-            val categories = database.categoryDao().getAllCategories() // Fetch all categories
+        // Fetch categories from Firestore collection "categories"
+        firestore.collection("categories")
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                // Clear the map in case of refresh
+                categoryMap.clear()
 
-            // Create a map from category names to their IDs
-            categoryMap = categories.associate { it.categoryName to it.id }.toMutableMap()
-
-            // Get the list of category names
-            val categoryNames = categoryMap.keys.toList()
-
-            // Create an adapter for the spinner
-            val adapter = ArrayAdapter(this@RemoveCategoryActivity, R.layout.spinner_item_white, categoryNames)
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) // Set dropdown item style
-            binding.categoriesSpinner.adapter = adapter // Set the adapter to the spinner
-
-            // Set item selected listener for the spinner
-            binding.categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>,
-                    view: View,
-                    position: Int,
-                    id: Long
-                ) {
-                    // Get the ID of the selected category
-                    val selectedName = categoryNames[position]
-                    selectedCategoryId = categoryMap[selectedName]
+                for (doc in querySnapshot.documents) {
+                    val name = doc.getString("categoryName") ?: "Unnamed"
+                    val id = doc.id
+                    categoryMap[name] = id
                 }
 
-                override fun onNothingSelected(parent: AdapterView<*>) {
-                    selectedCategoryId = null // Reset selection if nothing is selected
+                val categoryNames = categoryMap.keys.toList()
+
+                val adapter = ArrayAdapter(this, R.layout.spinner_item_white, categoryNames)
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                binding.categoriesSpinner.adapter = adapter
+
+                binding.categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                        parent: AdapterView<*>,
+                        view: View,
+                        position: Int,
+                        id: Long
+                    ) {
+                        val selectedName = categoryNames[position]
+                        selectedCategoryId = categoryMap[selectedName]
+                    }
+
+                    override fun onNothingSelected(parent: AdapterView<*>) {
+                        selectedCategoryId = null
+                    }
                 }
             }
-        }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to load categories: ${e.message}", Toast.LENGTH_LONG).show()
+            }
     }
 
-    // Setup the Confirm and Cancel buttons
     private fun setupButtons() {
         binding.ConfirmDelBtn.setOnClickListener {
-            deleteSelectedCategory() // Delete the selected category when Confirm button is clicked
+            deleteSelectedCategory()
         }
 
         binding.CancelDelBtn.setOnClickListener {
-            finish() // Close the activity when Cancel button is clicked
+            finish()
         }
     }
 
-    // Delete the selected category from the database
     private fun deleteSelectedCategory() {
         val id = selectedCategoryId
         if (id == null) {
-            Toast.makeText(this, "No category selected", Toast.LENGTH_SHORT).show() // Show error if no category is selected
+            Toast.makeText(this, "No category selected", Toast.LENGTH_SHORT).show()
             return
         }
 
-        lifecycleScope.launch {
-            val database = AppDatabase.getDatabase(applicationContext) // Get database instance
-            database.categoryDao().deleteCategoriesByIds(listOf(id)) // Delete category from database
-            Toast.makeText(this@RemoveCategoryActivity, "Category deleted", Toast.LENGTH_SHORT).show() // Show success message
-        }
-
-        finish() // Close the activity after deletion
+        firestore.collection("categories").document(id)
+            .delete()
+            .addOnSuccessListener {
+                Toast.makeText(this, "Category deleted", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to delete category: ${e.message}", Toast.LENGTH_LONG).show()
+            }
     }
 
-    // Setup the bottom navigation menu and handle item clicks
     private fun setupBottomNav() {
         findViewById<BottomNavigationView>(R.id.bottomNavigationView).setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.Logout -> {
-                    // Replace fragment with LogoutFragment when Logout is selected
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, LogoutFragment())
                         .commit()
                     true
                 }
                 R.id.Menu -> {
-                    // Replace fragment with Menu_NavFragment when Menu is selected
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, Menu_NavFragment())
                         .commit()
                     true
                 }
                 R.id.BudgetingGuides -> {
-                    // Replace fragment with BudgetingGuidesFragment when BudgetingGuides is selected
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, BudgetingGuidesFragment())
                         .commit()
                     true
                 }
                 R.id.Awards -> {
-                    // Replace fragment with AwardsFragment when Awards is selected
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, AwardsFragment())
                         .commit()
                     true
                 }
-                else -> false // Return false if no item is selected
+                else -> false
             }
         }
     }

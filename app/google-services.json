@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "840193918283",
+    "project_id": "jaktpoe",
+    "storage_bucket": "jaktpoe.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:840193918283:android:f952f0bfc704f442b714ce",
+        "android_client_info": {
+          "package_name": "vcmsa.projects.budgetbeaterspoe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "840193918283-kimsgtu7ijapb41n6mnq73a3hmismkbp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOLewSlh4V67pDRZaPwBEy42fV1YcjimY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "840193918283-kimsgtu7ijapb41n6mnq73a3hmismkbp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -6,123 +6,126 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.coroutines.launch
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 // Activity responsible for removing expenses
 class RemoveExpenseActivity : AppCompatActivity() {
 
-    // Variables to hold references to the adapter, database, and recycler view
     private lateinit var adapter: ExpenseAdapter
-    private lateinit var database: AppDatabase
     private lateinit var recyclerView: RecyclerView
 
-    // Called when the activity is created
+    // Firestore instance
+    private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+
+    // User ID (for filtering user's expenses)
+    private val currentUserId: String? get() = auth.currentUser?.uid
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_remove_expense) // Set the layout for this activity
+        setContentView(R.layout.activity_remove_expense)
 
-        // Initialize the RecyclerView and database
         recyclerView = findViewById(R.id.expensesRecyclerView)
-        database = AppDatabase.getDatabase(this)
 
-        // Set the exit button to close the activity when clicked
         findViewById<Button>(R.id.Exit).setOnClickListener {
-            finish() // Close the activity
+            finish()
         }
 
-        // Setup the RecyclerView and load expenses
         setupRecyclerView()
         loadExpenses()
 
-        // Setup the bottom navigation menu
         setupBottomNav()
     }
 
-    // Setup the RecyclerView with an adapter and click listener for each expense
     private fun setupRecyclerView() {
         adapter = ExpenseAdapter(emptyList()) { expense ->
-            showDeleteConfirmationDialog(expense) // Show confirmation dialog on expense click
+            showDeleteConfirmationDialog(expense)
         }
-        recyclerView.adapter = adapter // Set the adapter for the RecyclerView
+        recyclerView.adapter = adapter
     }
 
-    // Load all expenses from the database asynchronously
     private fun loadExpenses() {
-        lifecycleScope.launch {
-            val expenses = database.expenseDao().getAllExpenses() // Get all expenses from the database
-            runOnUiThread {
-                // Update the adapter with the fetched expenses
-                adapter = ExpenseAdapter(expenses) { expense ->
-                    showDeleteConfirmationDialog(expense) // Show confirmation dialog on expense click
+        val uid = currentUserId ?: return
+
+        // Query Firestore collection "expenses" filtered by current user
+        firestore.collection("expenses")
+            .whereEqualTo("userId", uid)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val expenses = querySnapshot.documents.map { doc ->
+                    ExpenseEntity(
+                        id = doc.id,
+                        name = doc.getString("name") ?: "",
+                        categoryId = doc.getString("categoryId") ?: "",
+                        amount = doc.getDouble("amount") ?: 0.0,
+                        date = doc.getString("date") ?: "",
+                        userId = doc.getString("userId") ?: "",
+                        imageUrl = doc.getString("imageUrl") ?: ""
+                    )
                 }
-                recyclerView.adapter = adapter // Set the updated adapter to the RecyclerView
+                adapter = ExpenseAdapter(expenses) { expense ->
+                    showDeleteConfirmationDialog(expense)
+                }
+                recyclerView.adapter = adapter
             }
-        }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to load expenses: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 
-    // Show a confirmation dialog to confirm expense deletion
     private fun showDeleteConfirmationDialog(expense: ExpenseEntity) {
         AlertDialog.Builder(this)
-            .setTitle("Delete Expense?") // Set dialog title
+            .setTitle("Delete Expense?")
             .setMessage(
-                // Display expense details in the dialog
                 "Expense: ${expense.name}\n" +
                         "Amount: R${expense.amount}\n" +
                         "Date: ${expense.date}\n" +
-                        "Category: ${expense.category}"
+                        "Category ID: ${expense.categoryId}"
             )
             .setPositiveButton("Yes") { _, _ ->
-                deleteExpense(expense) // Call deleteExpense if user confirms
+                deleteExpense(expense)
             }
-            .setNegativeButton("No", null) // Close dialog without action if user declines
+            .setNegativeButton("No", null)
             .show()
     }
 
-    // Delete the selected expense from the database
     private fun deleteExpense(expense: ExpenseEntity) {
-        lifecycleScope.launch {
-            database.expenseDao().deleteExpenseById(expense.id) // Delete expense from database
-            runOnUiThread {
-                loadExpenses() // Reload expenses after deletion
-                // Show a Toast message to confirm deletion
-                Toast.makeText(
-                    this@RemoveExpenseActivity,
-                    "Expense deleted successfully",
-                    Toast.LENGTH_SHORT
-                ).show()
+        firestore.collection("expenses")
+            .document(expense.id)
+            .delete()
+            .addOnSuccessListener {
+                Toast.makeText(this, "Expense deleted successfully", Toast.LENGTH_SHORT).show()
+                loadExpenses() // Refresh list
             }
-        }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to delete expense: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 
-    // Setup the bottom navigation menu and handle item clicks
     private fun setupBottomNav() {
         findViewById<BottomNavigationView>(R.id.bottomNavigationView).setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.Logout -> {
-                    // Replace current fragment with LogoutFragment when "Logout" is clicked
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, LogoutFragment())
                         .commit()
                     true
                 }
                 R.id.Menu -> {
-                    // Replace current fragment with Menu_NavFragment when "Menu" is clicked
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, Menu_NavFragment())
                         .commit()
                     true
                 }
                 R.id.BudgetingGuides -> {
-                    // Replace current fragment with BudgetingGuidesFragment when "Budgeting Guides" is clicked
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, BudgetingGuidesFragment())
                         .commit()
                     true
                 }
                 R.id.Awards -> {
-                    // Replace current fragment with AwardsFragment when "Awards" is clicked
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, AwardsFragment())
                         .commit()

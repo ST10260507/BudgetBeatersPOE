@@ -6,6 +6,7 @@ import androidx.activity.enableEdgeToEdge // Enables edge-to-edge layout to prov
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.auth.FirebaseAuth
 import vcmsa.projects.budgetbeaterspoe.databinding.ActivityMenuBinding
 
 class MenuActivity : AppCompatActivity() {
@@ -16,6 +17,14 @@ class MenuActivity : AppCompatActivity() {
         binding = ActivityMenuBinding.inflate(layoutInflater) // Inflate the layout using ViewBinding
         setContentView(binding.root) // Set the root view for this activity
         enableEdgeToEdge() // Allows the layout to use the entire screen area, including the status bar and navigation bar
+
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser == null) {
+            // No user logged in, redirect to Login screen
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
+        }
 
         // Set the padding of the main layout to adjust for system bars (status bar and navigation bar)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->

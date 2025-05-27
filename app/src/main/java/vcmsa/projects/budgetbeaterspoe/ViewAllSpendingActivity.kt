@@ -14,47 +14,43 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import vcmsa.projects.budgetbeaterspoe.databinding.ActivityViewAllSpendingBinding
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import vcmsa.projects.budgetbeaterspoe.databinding.ActivityViewAllSpendingBinding
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
 class ViewAllSpendingActivity : AppCompatActivity() {
 
-    // Binding and view variables
     private lateinit var binding: ActivityViewAllSpendingBinding
     private lateinit var barChart: BarChart
     private lateinit var etFromDate: EditText
     private lateinit var etToDate: EditText
+
+    // Firestore instance
+    private val firestore = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityViewAllSpendingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Initialize chart and date picker views
         initializeViews()
-        // Set up date pickers for filtering
         setupDatePickers()
-        // Configure chart appearance
         setupChartAppearance()
-        // Configure button click for filtering
         setupFilterButton()
-        // Load and display data
         loadData()
-        // Set up bottom navigation
         setupBottomNav()
     }
 
-    // Initialize view references
     private fun initializeViews() {
         barChart = binding.barChart
         etFromDate = binding.etFromDate
         etToDate = binding.etToDate
     }
 
-    // Set up date picker dialogs for input fields
     private fun setupDatePickers() {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
@@ -72,26 +68,22 @@ class ViewAllSpendingActivity : AppCompatActivity() {
             ).show()
         }
 
-        // Disable keyboard and attach date picker
         etFromDate.apply {
             setOnClickListener { createDatePicker(this) }
             keyListener = null
         }
-
         etToDate.apply {
             setOnClickListener { createDatePicker(this) }
             keyListener = null
         }
     }
 
-    // Set up filter button to reload data
     private fun setupFilterButton() {
         binding.btnFilter.setOnClickListener {
             loadData()
         }
     }
 
-    // Configure chart layout and interaction settings
     private fun setupChartAppearance() {
         with(barChart) {
             description.isEnabled = false
@@ -108,19 +100,18 @@ class ViewAllSpendingActivity : AppCompatActivity() {
         }
     }
 
-    // Load expense data from database and filter/display it
     private fun loadData() {
         val start = etFromDate.text.toString()
         val end = etToDate.text.toString()
 
         lifecycleScope.launch {
             try {
-                val database = AppDatabase.getDatabase(applicationContext)
-                val allExpenses = database.expenseDao().getAllExpenses()
+                val expenses = fetchExpensesFromFirestore()
+
                 val filteredExpenses = if (start.isNotEmpty() && end.isNotEmpty()) {
-                    filterExpensesByDate(allExpenses, start, end)
+                    filterExpensesByDate(expenses, start, end)
                 } else {
-                    allExpenses
+                    expenses
                 }
 
                 runOnUiThread {
@@ -136,7 +127,28 @@ class ViewAllSpendingActivity : AppCompatActivity() {
         }
     }
 
-    // Filter expense list based on user-selected date range
+    private suspend fun fetchExpensesFromFirestore(): List<ExpenseEntity> {
+        val snapshot = firestore.collection("expenses")
+            .get()
+            .await()
+
+        return snapshot.documents.mapNotNull { doc ->
+            try {
+                ExpenseEntity(
+                    id = doc.id,
+                    name = doc.getString("name") ?: "",
+                    categoryId = doc.getString("categoryId") ?: "",
+                    amount = doc.getDouble("amount") ?: 0.0,
+                    date = doc.getString("date") ?: "",
+                    userId = doc.getString("userId") ?: "",
+                    imageUrl = doc.getString("imageUrl") ?: ""
+                )
+            } catch (e: Exception) {
+                null
+            }
+        }
+    }
+
     private fun filterExpensesByDate(expenses: List<ExpenseEntity>, start: String, end: String): List<ExpenseEntity> {
         return try {
             val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -158,12 +170,11 @@ class ViewAllSpendingActivity : AppCompatActivity() {
         }
     }
 
-    // Display chart data using grouped expense categories
     private fun displayChartData(expenses: List<ExpenseEntity>) {
-        val categoryMap = expenses.groupBy { it.category }
+        val categoryMap = expenses.groupBy { it.categoryId }
             .mapValues { it.value.sumOf { exp -> exp.amount } }
 
-        val entries = categoryMap.entries.mapIndexed { i, (cat, total) ->
+        val entries = categoryMap.entries.mapIndexed { i, (_, total) ->
             BarEntry(i.toFloat(), total.toFloat())
         }
         val labels = categoryMap.keys.toList()
@@ -180,23 +191,18 @@ class ViewAllSpendingActivity : AppCompatActivity() {
             textColor = android.graphics.Color.WHITE
         }
 
-        barChart.legend.apply {
-            textColor = android.graphics.Color.WHITE // ✅ Sets legend text color to white
-        }
-
+        barChart.legend.textColor = android.graphics.Color.WHITE
         barChart.data = BarData(dataSet)
         barChart.animateY(1000)
         barChart.invalidate()
     }
 
-    // Show a toast if no expenses were found
     private fun showNoDataMessage() {
         Toast.makeText(this, "No expenses found in selected range", Toast.LENGTH_SHORT).show()
         barChart.clear()
         barChart.invalidate()
     }
 
-    // Show a toast if an error occurs during data loading
     private fun showError(e: Exception) {
         runOnUiThread {
             Toast.makeText(
@@ -207,7 +213,6 @@ class ViewAllSpendingActivity : AppCompatActivity() {
         }
     }
 
-    // Set up navigation between fragments via bottom nav bar
     private fun setupBottomNav() {
         findViewById<BottomNavigationView>(R.id.bottomNavigationView).setOnItemSelectedListener { item ->
             when (item.itemId) {

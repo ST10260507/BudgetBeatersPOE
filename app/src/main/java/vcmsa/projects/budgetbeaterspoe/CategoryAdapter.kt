@@ -10,11 +10,11 @@ import vcmsa.projects.budgetbeaterspoe.R  // Imports the resource file for acces
 // Adapter class for displaying a list of CategoryEntity items in a RecyclerView
 class CategoryAdapter(
     private val categories: MutableList<CategoryEntity>,  // List of categories to display in the RecyclerView
-    private val onSelectionChanged: (Set<Int>) -> Unit  // Callback function to notify when the selection changes
+    private val onSelectionChanged: (Set<String>) -> Unit  // Callback function to notify when the selection changes
 ) : RecyclerView.Adapter<CategoryAdapter.ViewHolder>() {
 
     // Set to keep track of selected category IDs
-    private val selectedIds = mutableSetOf<Int>()
+    private val selectedIds = mutableSetOf<String>()
 
     // ViewHolder class that holds references to UI components in each item view
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

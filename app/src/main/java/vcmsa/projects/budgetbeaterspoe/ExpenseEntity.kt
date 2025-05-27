@@ -1,16 +1,12 @@
 package vcmsa.projects.budgetbeaterspoe
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-
-// Entity class for the "expenses" table in the Room database
-@Entity(tableName = "expenses")
 data class ExpenseEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0, // Unique ID for each expense (auto-generated)
-    val name: String, // Name of the expense (e.g., "Lunch", "Transport")
-    val category: String, // Category of the expense (e.g., "Food", "Travel")
-    val date: String, // Date when the expense occurred
-    val amount: Double, // Amount spent on the expense
-    val description: String?, // Optional description of the expense (nullable)
-    val imagePath: String? // Optional path to the image related to the expense (nullable)
+    val id: String = "",              // Firestore document ID
+    val name: String = "",            // Name or title of the expense
+    val categoryId: String = "",      // Reference to CategoryEntity.id
+    val amount: Double = 0.0,
+    val date: String = "",            // ISO 8601 or timestamp
+    val userId: String = "",          // Reference to UserEntity.id
+    val imageUrl: String = ""         // URL to image in Firebase Storage
 )
+

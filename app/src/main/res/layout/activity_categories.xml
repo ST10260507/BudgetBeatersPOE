@@ -63,7 +63,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/gradientCurvedBg" />
+        app:layout_constraintTop_toTopOf="@id/gradientCurvedBg"
+        tools:ignore="HardcodedText" />
 
     <!-- White separator line below the text -->
     <ImageView
@@ -74,7 +75,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/CategoriesList"
+        app:layout_constraintTop_toBottomOf="@id/CategoriesList"
         app:srcCompat="@drawable/white_line" />
 
     <!-- RecyclerView to display list of categories -->

@@ -8,124 +8,117 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.lifecycleScope
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import vcmsa.projects.budgetbeaterspoe.databinding.ActivityLoginBinding
-import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
 
+    // Firebase instances
+    private lateinit var auth: FirebaseAuth
+    private lateinit var firestore: FirebaseFirestore
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityLoginBinding.inflate(layoutInflater) // Inflate the layout for the login activity
+        binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        enableEdgeToEdge() // Enable edge-to-edge layout for the app
+        enableEdgeToEdge()
 
-        // Set a listener for applying window insets (system bars like status and navigation bars)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars()) // Get system bars insets
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom) // Apply padding to the view
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        // Set onClickListener for login button
-        binding.LoginBtn.setOnClickListener {
-            val username = binding.LoginNameInput.text.toString().trim() // Get the username input
-            val password = binding.PasswordInput.text.toString().trim() // Get the password input
+        // Initialize Firebase instances
+        auth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
 
-            // Validate input fields and proceed to authentication if valid
-            if (validateInput(username, password)) {
-                authenticateUser(username, password)
+        binding.LoginBtn.setOnClickListener {
+            val emailOrUsername = binding.LoginNameInput.text.toString().trim()
+            val password = binding.PasswordInput.text.toString().trim()
+
+            if (validateInput(emailOrUsername, password)) {
+                // Firebase Authentication requires email,
+                // but if you want to login by username, you'll need to fetch email from Firestore first
+                // Here we'll assume the user inputs an email (adjust if you want username login)
+                authenticateUserByEmail(emailOrUsername, password)
             }
         }
 
-        // Set onClickListener for forgot password button
         binding.ForgotPasswordBtn.setOnClickListener {
-            // Navigate to ForgotPassActivity for password reset
             startActivity(Intent(this, ForgotPassActivity::class.java))
         }
 
-        // Set onClickListener for register button
         binding.RegisterBtn.setOnClickListener {
-            // Navigate to RegisterActivity for user registration
             startActivity(Intent(this, RegisterActivity::class.java))
         }
     }
 
-    // Function to validate user input for login
     private fun validateInput(username: String, password: String): Boolean {
         var isValid = true
 
-        // Check if username is empty
         if (username.isEmpty()) {
-            binding.LoginNameInput.error = "Username required" // Show error if empty
+            binding.LoginNameInput.error = "Email or Username required"
             isValid = false
         }
 
-        // Check if password is empty
         if (password.isEmpty()) {
-            binding.PasswordInput.error = "Password required" // Show error if empty
+            binding.PasswordInput.error = "Password required"
             isValid = false
         }
 
-        return isValid // Return whether input is valid or not
+        return isValid
     }
 
-    // Function to authenticate the user with the provided username and password
-    private fun authenticateUser(username: String, password: String) {
-        lifecycleScope.launch {
-            try {
-                // Access the database to fetch the user by username or email
-                val database = AppDatabase.getDatabase(applicationContext)
-                val user = database.userDao().getUserByUsernameOrEmail(username, username)
-
-                runOnUiThread {
-                    if (user != null && user.password == password) {
-                        handleSuccessfulLogin(user) // Handle successful login
-                    } else {
-                        showLoginError() // Show login error for invalid credentials
+    private fun authenticateUserByEmail(email: String, password: String) {
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    // Login successful, get the logged-in user
+                    val firebaseUser = auth.currentUser
+                    if (firebaseUser != null) {
+                        // Fetch user data from Firestore (optional but recommended)
+                        firestore.collection("users")
+                            .document(firebaseUser.uid)
+                            .get()
+                            .addOnSuccessListener { document ->
+                                if (document != null && document.exists()) {
+                                    val userMap = document.data
+                                    val username = userMap?.get("username") as? String ?: email
+                                    handleSuccessfulLogin(username)
+                                } else {
+                                    // User document does not exist, fallback to email as username
+                                    handleSuccessfulLogin(email)
+                                }
+                            }
+                            .addOnFailureListener {
+                                // Firestore fetch failed, still proceed with email as username
+                                handleSuccessfulLogin(email)
+                            }
                     }
-                }
-            } catch (e: Exception) {
-                runOnUiThread {
-                    // Show error message if any exception occurs during the authentication process
-                    Toast.makeText(
-                        this@LoginActivity,
-                        "Login error: ${e.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                } else {
+                    // Login failed
+                    showLoginError()
                 }
             }
-        }
     }
 
-    // Function to handle successful login
-    private fun handleSuccessfulLogin(user: UserEntity) {
-        // Save the logged-in user's username in shared preferences
+    private fun handleSuccessfulLogin(username: String) {
         val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
-            putString("logged_in_user", user.username)
-            apply() // Apply changes to shared preferences
+            putString("logged_in_user", username)
+            apply()
         }
 
-        // Show a success message
         Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
-
-        // Start the MenuActivity and finish the login activity
         startActivity(Intent(this, MenuActivity::class.java))
         finish()
     }
 
-    // Function to show an error message for invalid login credentials
     private fun showLoginError() {
-        // Set error on the password input field
         binding.PasswordInput.error = "Invalid credentials"
-
-        // Show a toast message indicating wrong credentials
-        Toast.makeText(
-            this@LoginActivity,
-            "Wrong username or password",
-            Toast.LENGTH_SHORT
-        ).show()
+        Toast.makeText(this, "Wrong email or password", Toast.LENGTH_SHORT).show()
     }
 }

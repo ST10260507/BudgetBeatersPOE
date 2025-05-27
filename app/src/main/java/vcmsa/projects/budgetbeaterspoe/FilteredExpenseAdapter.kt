@@ -37,10 +37,10 @@ class FilteredExpenseAdapter(
         holder.date.text   = expense.date // Set the expense date
 
         // If the expense has an image path, load and display the image
-        if (!expense.imagePath.isNullOrEmpty()) {
+        if (!expense.imageUrl.isNullOrEmpty()) {
             holder.image.visibility = View.VISIBLE // Make the image visible
             Glide.with(holder.itemView.context) // Use Glide to load the image
-                .load(Uri.parse(expense.imagePath)) // Parse the image path to a URI
+                .load(Uri.parse(expense.imageUrl)) // Parse the image path to a URI
                 .into(holder.image) // Set the loaded image into the ImageView
         } else {
             holder.image.visibility = View.GONE // If no image, hide the ImageView

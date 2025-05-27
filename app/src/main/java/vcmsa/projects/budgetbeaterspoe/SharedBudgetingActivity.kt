@@ -1,6 +1,5 @@
 package vcmsa.projects.budgetbeaterspoe
 
-// Import required Android and lifecycle libraries
 import android.content.Context
 import android.os.Bundle
 import android.text.Editable
@@ -13,82 +12,75 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.coroutines.launch
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class SharedBudgetingActivity : AppCompatActivity() {
-    private lateinit var membersContainer: LinearLayout  // Container for member input fields
-    private lateinit var memberCountInput: EditText      // Input field for number of members
-    private lateinit var submitButton: Button            // Button to submit members
-    private lateinit var database: AppDatabase           // App database instance
-    private var currentUserId: Int = -1                  // Stores logged-in user's ID
+    private lateinit var membersContainer: LinearLayout
+    private lateinit var memberCountInput: EditText
+    private lateinit var submitButton: Button
+
+    private val auth = FirebaseAuth.getInstance()
+    private val firestore = FirebaseFirestore.getInstance()
+    private val currentUser get() = auth.currentUser
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_shared_budgeting)
 
-        // Initialize views and database
-        database = AppDatabase.getDatabase(this)
         membersContainer = findViewById(R.id.membersContainer)
         memberCountInput = findViewById(R.id.memberCountInput)
         submitButton = findViewById(R.id.submitButton)
 
-        // Setup listeners and data
         setupNumberInputListener()
         setupSubmitButton()
-        loadCurrentUser()
+        loadExistingSharedUsers()
 
-        // Handle edge-to-edge window insets
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        setupBottomNav() // Initialize bottom navigation
+        setupBottomNav()
     }
 
-    // Loads the currently logged-in user's ID from shared preferences
-    private fun loadCurrentUser() {
-        val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-        val username = sharedPref.getString("logged_in_user", "") ?: ""
-
-        lifecycleScope.launch {
-            val user = database.userDao().getUserByUsername(username)
-            if (user != null) {
-                currentUserId = user.id
-                loadExistingSharedUsers()
-            } else {
-                runOnUiThread {
-                    Toast.makeText(
-                        this@SharedBudgetingActivity,
-                        "User not logged in!",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    finish() // Close activity if no user is logged in
-                }
-            }
-        }
-    }
-
-    // Loads and displays shared users previously saved for the current user
     private fun loadExistingSharedUsers() {
-        lifecycleScope.launch {
-            val sharedUsers = database.sharedUserDao().getSharedUsersByOwner(currentUserId)
-            runOnUiThread {
+        val uid = currentUser?.uid
+        if (uid == null) {
+            Toast.makeText(this, "User not logged in!", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
+        firestore.collection("sharedUsers")
+            .whereEqualTo("ownerUserId", uid)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val sharedUsers = querySnapshot.documents.map { doc ->
+                    SharedUser(
+                        id = doc.id,
+                        ownerUserId = doc.getString("ownerUserId") ?: "",
+                        sharedUserName = doc.getString("sharedUserName") ?: "",
+                        sharedUserEmail = doc.getString("sharedUserEmail") ?: ""
+                    )
+                }
+
                 if (sharedUsers.isNotEmpty()) {
                     memberCountInput.setText(sharedUsers.size.toString())
-                    sharedUsers.forEachIndexed { index, sharedUser ->
-                        addMemberInputFields(index + 1, sharedUser.sharedUserName, sharedUser.sharedUserEmail)
+                    membersContainer.removeAllViews()
+                    sharedUsers.forEachIndexed { index, user ->
+                        addMemberInputFields(index + 1, user.sharedUserName, user.sharedUserEmail)
                     }
                 }
             }
-        }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to load shared users", Toast.LENGTH_SHORT).show()
+            }
     }
 
-    // Listens for changes in the member count input to dynamically update UI
     private fun setupNumberInputListener() {
         memberCountInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -99,7 +91,6 @@ class SharedBudgetingActivity : AppCompatActivity() {
         })
     }
 
-    // Updates the number of member input fields based on the entered count
     private fun updateMemberFields() {
         val memberCount = memberCountInput.text.toString().toIntOrNull() ?: 0
         membersContainer.removeAllViews()
@@ -111,7 +102,6 @@ class SharedBudgetingActivity : AppCompatActivity() {
         }
     }
 
-    // Adds input fields for a member's name and email
     private fun addMemberInputFields(memberNumber: Int, name: String = "", email: String = "") {
         val nameEditText = EditText(this).apply {
             hint = "Member $memberNumber Name"
@@ -123,9 +113,7 @@ class SharedBudgetingActivity : AppCompatActivity() {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                bottomMargin = 16.dpToPx()
-            }
+            ).apply { bottomMargin = 16.dpToPx() }
         }
 
         val emailEditText = EditText(this).apply {
@@ -139,19 +127,17 @@ class SharedBudgetingActivity : AppCompatActivity() {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                bottomMargin = 24.dpToPx()
-            }
+            ).apply { bottomMargin = 24.dpToPx() }
         }
 
         membersContainer.addView(nameEditText)
         membersContainer.addView(emailEditText)
     }
 
-    // Handles submission of shared members to the database
     private fun setupSubmitButton() {
         submitButton.setOnClickListener {
-            if (currentUserId == -1) {
+            val uid = currentUser?.uid
+            if (uid == null) {
                 Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -162,7 +148,7 @@ class SharedBudgetingActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val members = mutableListOf<Pair<String, String>>()
+            val members = mutableListOf<Map<String, Any>>()
             for (i in 0 until membersContainer.childCount step 2) {
                 val name = (membersContainer.getChildAt(i) as EditText).text.toString().trim()
                 val email = (membersContainer.getChildAt(i + 1) as EditText).text.toString().trim()
@@ -175,40 +161,54 @@ class SharedBudgetingActivity : AppCompatActivity() {
                     Toast.makeText(this, "Invalid email format", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
-                members.add(Pair(name, email))
-            }
-
-            // Save members to the database using a coroutine
-            lifecycleScope.launch {
-                // Remove previous shared users
-                database.sharedUserDao().deleteSharedUsersForOwner(currentUserId)
-
-                // Insert new shared user records
-                members.forEach { (name, email) ->
-                    database.sharedUserDao().insertSharedUser(
-                        SharedUserEntity(
-                            ownerUserId = currentUserId,
-                            sharedUserName = name,
-                            sharedUserEmail = email
-                        )
+                members.add(
+                    mapOf(
+                        "ownerUserId" to uid,
+                        "sharedUserName" to name,
+                        "sharedUserEmail" to email
                     )
-                }
-
-                runOnUiThread {
-                    Toast.makeText(
-                        this@SharedBudgetingActivity,
-                        "Successfully shared with ${members.size} members!",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                )
             }
+
+            // Delete old shared users and add new ones
+            firestore.collection("sharedUsers")
+                .whereEqualTo("ownerUserId", uid)
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    val batch = firestore.batch()
+
+                    // Delete existing shared users
+                    for (doc in querySnapshot.documents) {
+                        batch.delete(doc.reference)
+                    }
+
+                    // Add new shared users
+                    members.forEach { member ->
+                        val newDoc = firestore.collection("sharedUsers").document()
+                        batch.set(newDoc, member)
+                    }
+
+                    batch.commit()
+                        .addOnSuccessListener {
+                            Toast.makeText(
+                                this,
+                                "Successfully shared with ${members.size} members!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(this, "Failed to save shared users", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Failed to update shared users", Toast.LENGTH_SHORT).show()
+                }
         }
     }
 
-    // Extension function to convert dp values to pixels
     private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
 
-    // Sets up the bottom navigation bar and its fragment actions
     private fun setupBottomNav() {
         findViewById<BottomNavigationView>(R.id.bottomNavigationView).setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -240,4 +240,12 @@ class SharedBudgetingActivity : AppCompatActivity() {
             }
         }
     }
+
+    // Data class to represent shared user data (optional)
+    data class SharedUser(
+        val id: String = "",
+        val ownerUserId: String = "",
+        val sharedUserName: String = "",
+        val sharedUserEmail: String = ""
+    )
 }
