@@ -1,0 +1,39 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp"
+    android:height="24dp"
+    android:viewportWidth="96"
+    android:viewportHeight="24"
+    android:tint="#000000"
+    android:rotation="-45">
+
+    <!-- Left brackets << -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="
+            M6,12 L12,6 L10,4 L0,12 L10,20 L12,18 Z
+            M16,12 L22,6 L20,4 L10,12 L20,20 L22,18 Z" />
+
+    <!-- Middle diamond (extended) -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="
+            M26,12 L36,2 L76,2 L86,12 L76,22 L36,22 Z" />
+
+    <!-- Right brackets >> (original) -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="
+            M74,12 L68,6 L70,4 L80,12 L70,20 L68,18 Z
+            M64,12 L58,6 L60,4 L70,12 L60,20 L58,18 Z" />
+
+    <!-- New extra bracket >> -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="
+            M84,12 L78,6 L80,4 L90,12 L80,20 L78,18 Z
+            M94,12 L88,6 L90,4 L100,12 L90,20 L88,18 Z" />
+</vector>
+
+
+
+

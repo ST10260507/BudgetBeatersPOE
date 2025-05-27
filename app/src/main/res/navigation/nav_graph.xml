@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/menu_NavFragment">
+
+    <fragment
+        android:id="@+id/menu_NavFragment"
+        android:name="vcmsa.projects.budgetbeaterspoe.Menu_NavFragment"
+        android:label="fragment_menu__nav"
+        tools:layout="@layout/fragment_menu__nav" />
+    <fragment
+        android:id="@+id/awardsFragment"
+        android:name="vcmsa.projects.budgetbeaterspoe.AwardsFragment"
+        android:label="fragment_awards"
+        tools:layout="@layout/fragment_awards" />
+    <fragment
+        android:id="@+id/budgetingGuidesFragment"
+        android:name="vcmsa.projects.budgetbeaterspoe.BudgetingGuidesFragment"
+        android:label="fragment_budgeting_guides"
+        tools:layout="@layout/fragment_budgeting_guides" />
+    <fragment
+        android:id="@+id/logoutFragment"
+        android:name="vcmsa.projects.budgetbeaterspoe.LogoutFragment"
+        android:label="fragment_logout"
+        tools:layout="@layout/fragment_logout" />
+</navigation>

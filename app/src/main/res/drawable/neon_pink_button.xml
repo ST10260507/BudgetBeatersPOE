@@ -1,0 +1,14 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#FF00CC" /> <!-- Brighter pink when pressed -->
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#FF1493" /> <!-- Neon pink -->
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+</selector>
