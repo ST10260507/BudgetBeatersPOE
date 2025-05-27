@@ -18,12 +18,12 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/title_banner" />
+        app:srcCompat="@drawable/islamic_label" />
 
     <!-- Main title for the Shared Budgeting screen -->
     <TextView
         android:id="@+id/SharedBudgetingtxt"
-        android:layout_width="325dp"
+        android:layout_width="400dp"
         android:layout_height="110dp"
         android:layout_marginTop="7dp"
         android:fontFamily="sans-serif-medium"

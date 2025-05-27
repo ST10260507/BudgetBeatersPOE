@@ -16,24 +16,26 @@
         <!-- Image view for a decorative element (black squiggle) -->
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="413dp"
-            android:layout_height="278dp"
+            android:layout_width="wrap_content"
+            android:layout_height="130dp"
+            android:layout_marginTop="0dp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/black_squiggle" />
+            app:srcCompat="@drawable/islamic_label" />
 
         <!-- Main title for the activity, prominently displays "REMOVE A CATEGORY" -->
         <TextView
             android:id="@+id/RemoveCategoryTxt"
-            android:layout_width="273dp"
-            android:layout_height="161dp"
-            android:layout_marginTop="40dp"
+            android:layout_width="400dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="30dp"
             android:fontFamily="sans-serif-medium"
             android:gravity="center"
             android:text="REMOVE A CATEGORY"
             android:textColor="@android:color/white"
-            android:textSize="40sp"
+            android:textSize="32sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -44,7 +46,7 @@
             android:id="@+id/gradientCurvedBg"
             android:layout_width="492dp"
             android:layout_height="669dp"
-            android:layout_marginTop="200dp"
+            android:layout_marginTop="90dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.777"
             app:layout_constraintStart_toStartOf="parent"
