@@ -9,15 +9,15 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class CategoriesActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: SimpleCategoryAdapter
-
-    // Firestore instance
     private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,9 +47,11 @@ class CategoriesActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
     }
 
-    // Load categories from Firestore collection "categories"
     private fun loadCategoriesFromFirestore() {
+        val userId = auth.currentUser?.uid ?: return
+
         firestore.collection("categories")
+            .whereEqualTo("userId", userId)
             .get()
             .addOnSuccessListener { result ->
                 val categories = mutableListOf<CategoryEntity>()
@@ -61,8 +63,6 @@ class CategoriesActivity : AppCompatActivity() {
                 recyclerView.adapter = adapter
             }
             .addOnFailureListener { exception ->
-                // Handle errors here if needed
-                // e.g. Toast.makeText(this, "Failed to load categories.", Toast.LENGTH_SHORT).show()
                 exception.printStackTrace()
             }
     }

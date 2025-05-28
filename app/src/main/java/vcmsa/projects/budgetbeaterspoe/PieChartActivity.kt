@@ -12,12 +12,14 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class PieChartActivity : AppCompatActivity() {
 
     private lateinit var pieChart: PieChart
     private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,12 +48,13 @@ class PieChartActivity : AppCompatActivity() {
     }
 
     private fun setupPieChart() {
-        // Assuming your Firestore collection is named "categories"
+        val userId = auth.currentUser?.uid ?: return
+
         firestore.collection("categories")
+            .whereEqualTo("userId", userId)
             .get()
             .addOnSuccessListener { querySnapshot ->
                 val categories = querySnapshot.documents.map { doc ->
-                    // Map Firestore document to your CategoryEntity data class
                     CategoryEntity(
                         id = doc.id,
                         categoryName = doc.getString("categoryName") ?: "",
@@ -103,7 +106,6 @@ class PieChartActivity : AppCompatActivity() {
                 }
             }
             .addOnFailureListener { e ->
-                // Handle errors here
                 pieChart.clear()
                 pieChart.invalidate()
             }

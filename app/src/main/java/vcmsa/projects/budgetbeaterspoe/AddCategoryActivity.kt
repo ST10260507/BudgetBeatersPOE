@@ -7,12 +7,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import vcmsa.projects.budgetbeaterspoe.databinding.ActivityAddCategoryBinding
 
 class AddCategoryActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAddCategoryBinding
     private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,20 +35,20 @@ class AddCategoryActivity : AppCompatActivity() {
             val description = binding.DescriptionInput.text.toString().trim()
             val maxLimitStr = binding.MaxLimitInput.text.toString().trim()
             val minLimitStr = binding.MinLimitInput.text.toString().trim()
+            val userId = auth.currentUser?.uid ?: ""
 
             if (validateInput(categoryName, maxLimitStr, minLimitStr)) {
                 val maxLimit = maxLimitStr.toInt()
                 val minLimit = minLimitStr.toInt()
 
-                // Create a map representing the category data
                 val categoryData = hashMapOf(
                     "categoryName" to categoryName,
                     "description" to if (description.isNotEmpty()) description else null,
                     "maxLimit" to maxLimit,
-                    "minLimit" to minLimit
+                    "minLimit" to minLimit,
+                    "userId" to userId
                 )
 
-                // Save category to Firestore collection "categories"
                 firestore.collection("categories")
                     .add(categoryData)
                     .addOnSuccessListener {
@@ -55,7 +57,7 @@ class AddCategoryActivity : AppCompatActivity() {
                             "Category saved successfully!",
                             Toast.LENGTH_SHORT
                         ).show()
-                        finish()  // Close activity after saving
+                        finish()
                     }
                     .addOnFailureListener { e ->
                         Toast.makeText(
