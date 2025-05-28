@@ -23,7 +23,7 @@
     <!-- LOGIN title text -->
     <TextView
         android:id="@+id/Logintxt"
-        android:text="LOGIN"
+        android:text="EMAIL"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="36dp"
@@ -55,7 +55,7 @@
         android:layout_height="50dp"
         android:layout_marginTop="242dp"
         android:background="@drawable/edit_text_bg"
-        android:hint="ENTER NAME"
+        android:hint="ENTER EMAIL"
         android:inputType="textPersonName"
         android:padding="10dp"
         android:textColor="@android:color/black"
