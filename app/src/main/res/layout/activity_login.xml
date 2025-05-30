@@ -18,7 +18,9 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/islamic_label" />
+        app:srcCompat="@drawable/title_banner" />
+
+
 
     <!-- LOGIN title text -->
     <TextView
