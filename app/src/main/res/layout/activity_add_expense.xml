@@ -17,7 +17,8 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/islamic_label" />
+        app:srcCompat="@drawable/title_banner" />
+
 
     <TextView
         android:id="@+id/ExpenseDetailstxt"
@@ -28,7 +29,7 @@
         android:gravity="center"
         android:text="ADD AN EXPENSE"
         android:textColor="@android:color/white"
-        android:textSize="38sp"
+        android:textSize="32sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/imageView"
         app:layout_constraintHorizontal_bias="0.491"
