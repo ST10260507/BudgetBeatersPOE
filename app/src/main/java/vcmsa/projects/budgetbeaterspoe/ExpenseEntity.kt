@@ -1,12 +1,12 @@
 package vcmsa.projects.budgetbeaterspoe
 
 data class ExpenseEntity(
-    val id: String = "",              // Firestore document ID
-    val name: String = "",            // Name or title of the expense
-    val categoryId: String = "",      // Reference to CategoryEntity.id
+    val id: String = "",
+    val name: String = "",
+    val category: String = "",  // Changed from categoryId to category name
     val amount: Double = 0.0,
-    val date: String = "",            // ISO 8601 or timestamp
-    val userId: String = "",          // Reference to UserEntity.id
-    val imageUrl: String = ""         // URL to image in Firebase Storage
+    val date: String = "",
+    val userId: String = "",
+    val imageUrl: String = "",
+    val description: String? = null  // Added
 )
-
