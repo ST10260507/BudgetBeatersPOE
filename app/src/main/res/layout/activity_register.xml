@@ -18,7 +18,8 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/islamic_label" />
+        app:srcCompat="@drawable/title_banner" />
+
 
     <!-- Main header text for registration -->
     <TextView
@@ -28,7 +29,7 @@
         android:layout_marginTop="36dp"
         android:text="REGISTER"
         android:textColor="@android:color/white"
-        android:textSize="35sp"
+        android:textSize="40sp"
         android:textStyle="bold"
         android:fontFamily="sans-serif-medium"
         android:gravity="center"

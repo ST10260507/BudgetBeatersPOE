@@ -1,9 +1,16 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.BudgetBeatersPOE" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Fix for Material 3 overriding button background -->
+        <item name="materialButtonStyle">@style/MyButton</item>
     </style>
 
     <style name="Theme.BudgetBeatersPOE" parent="Base.Theme.BudgetBeatersPOE" />
+
+    <!-- Custom button style to disable purple background -->
+    <style name="MyButton" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@null</item>
+        <item name="android:backgroundTint">@null</item>
+        <item name="android:background">@null</item>
+    </style>
 </resources>
