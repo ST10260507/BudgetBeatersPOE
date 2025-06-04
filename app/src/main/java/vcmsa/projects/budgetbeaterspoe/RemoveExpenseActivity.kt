@@ -58,7 +58,7 @@ class RemoveExpenseActivity : AppCompatActivity() {
                     ExpenseEntity(
                         id = doc.id,
                         name = doc.getString("name") ?: "",
-                        categoryId = doc.getString("categoryId") ?: "",
+                        category = doc.getString("category") ?: "",
                         amount = doc.getDouble("amount") ?: 0.0,
                         date = doc.getString("date") ?: "",
                         userId = doc.getString("userId") ?: "",
@@ -82,7 +82,7 @@ class RemoveExpenseActivity : AppCompatActivity() {
                 "Expense: ${expense.name}\n" +
                         "Amount: R${expense.amount}\n" +
                         "Date: ${expense.date}\n" +
-                        "Category ID: ${expense.categoryId}"
+                        "Category ID: ${expense.category}"
             )
             .setPositiveButton("Yes") { _, _ ->
                 deleteExpense(expense)
