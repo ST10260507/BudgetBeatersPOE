@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import vcmsa.projects.budgetbeaterspoe.databinding.ActivityAddExpenseBinding
@@ -24,17 +25,15 @@ import java.util.*
 
 class AddExpenseActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAddExpenseBinding
-    private var selectedImageUri: Uri? = null // To store the selected image URI
-
-    // Firebase instances
+    private var selectedImageUri: Uri? = null
     private val firestore = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
+    private val auth = FirebaseAuth.getInstance() // Added
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddExpenseBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         enableEdgeToEdge()
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -55,12 +54,21 @@ class AddExpenseActivity : AppCompatActivity() {
             val date = binding.DATEInput.text.toString().trim()
             val amount = binding.EXPENSEInput3.text.toString().trim().toDoubleOrNull()
             val description = binding.EXPENSEDescriptionInput.text.toString().trim()
+            val userId = auth.currentUser?.uid ?: "" // Added
 
             if (validateInput(expenseName, category, date, amount, description)) {
                 lifecycleScope.launch {
                     try {
                         val imageUrl = selectedImageUri?.let { uri -> uploadImageToFirebase(uri) }
-                        saveExpenseToFirestore(expenseName, category, date, amount!!, description, imageUrl)
+                        saveExpenseToFirestore(
+                            name = expenseName,
+                            category = category,
+                            date = date,
+                            amount = amount!!,
+                            description = description,
+                            imageUrl = imageUrl,
+                            userId = userId // Added
+                        )
 
                         withContext(Dispatchers.Main) {
                             Toast.makeText(this@AddExpenseActivity, "Expense saved successfully!", Toast.LENGTH_SHORT).show()
@@ -92,9 +100,14 @@ class AddExpenseActivity : AppCompatActivity() {
     }
 
     private fun loadCategoriesFromFirestore() {
+        val userId = auth.currentUser?.uid ?: return // Added
+
         lifecycleScope.launch {
             try {
-                val snapshot = firestore.collection("categories").get().await()
+                val snapshot = firestore.collection("categories")
+                    .whereEqualTo("userId", userId) // Added filter
+                    .get().await()
+
                 val categoryNames = snapshot.documents.mapNotNull { it.getString("categoryName") }
 
                 if (categoryNames.isNotEmpty()) {
@@ -160,23 +173,21 @@ class AddExpenseActivity : AppCompatActivity() {
         return isValid
     }
 
-    // Upload image to Firebase Storage and return its download URL
     private suspend fun uploadImageToFirebase(uri: Uri): String {
         val filename = "expenses_images/${UUID.randomUUID()}"
         val ref = storage.reference.child(filename)
-
         ref.putFile(uri).await()
         return ref.downloadUrl.await().toString()
     }
 
-    // Save expense details to Firestore
     private suspend fun saveExpenseToFirestore(
         name: String,
         category: String,
         date: String,
         amount: Double,
         description: String,
-        imageUrl: String?
+        imageUrl: String?,
+        userId: String // Added
     ) {
         val expenseData = hashMapOf(
             "name" to name,
@@ -184,7 +195,8 @@ class AddExpenseActivity : AppCompatActivity() {
             "date" to date,
             "amount" to amount,
             "description" to if (description.isNotEmpty()) description else null,
-            "imageUrl" to imageUrl
+            "imageUrl" to imageUrl,
+            "userId" to userId // Added
         )
 
         firestore.collection("expenses").add(expenseData).await()

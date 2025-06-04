@@ -14,6 +14,7 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -28,9 +29,8 @@ class ViewAllSpendingActivity : AppCompatActivity() {
     private lateinit var barChart: BarChart
     private lateinit var etFromDate: EditText
     private lateinit var etToDate: EditText
-
-    // Firestore instance
     private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance() // Added
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -128,7 +128,10 @@ class ViewAllSpendingActivity : AppCompatActivity() {
     }
 
     private suspend fun fetchExpensesFromFirestore(): List<ExpenseEntity> {
+        val userId = auth.currentUser?.uid ?: return emptyList() // Added
+
         val snapshot = firestore.collection("expenses")
+            .whereEqualTo("userId", userId) // Added filter
             .get()
             .await()
 
@@ -137,11 +140,12 @@ class ViewAllSpendingActivity : AppCompatActivity() {
                 ExpenseEntity(
                     id = doc.id,
                     name = doc.getString("name") ?: "",
-                    categoryId = doc.getString("categoryId") ?: "",
+                    category = doc.getString("category") ?: "", // Changed to "category"
                     amount = doc.getDouble("amount") ?: 0.0,
                     date = doc.getString("date") ?: "",
                     userId = doc.getString("userId") ?: "",
-                    imageUrl = doc.getString("imageUrl") ?: ""
+                    imageUrl = doc.getString("imageUrl") ?: "",
+                    description = doc.getString("description") ?: ""
                 )
             } catch (e: Exception) {
                 null
@@ -171,7 +175,8 @@ class ViewAllSpendingActivity : AppCompatActivity() {
     }
 
     private fun displayChartData(expenses: List<ExpenseEntity>) {
-        val categoryMap = expenses.groupBy { it.categoryId }
+        // Changed to group by "category" instead of "categoryId"
+        val categoryMap = expenses.groupBy { it.category }
             .mapValues { it.value.sumOf { exp -> exp.amount } }
 
         val entries = categoryMap.entries.mapIndexed { i, (_, total) ->
