@@ -91,10 +91,13 @@
         android:background="@drawable/login_button_colour"
         android:text="LOGIN"
         android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/PasswordInput" />
+        app:layout_constraintTop_toBottomOf="@id/PasswordInput"
+        app:strokeColor="#FAF6F6" />
 
     <!-- Decorative white line below login button -->
     <ImageView
@@ -116,6 +119,7 @@
         android:layout_marginTop="8dp"
         android:background="@drawable/neon_pink_button"
         android:text="RESET PASSWORD"
+        android:textStyle="bold"
         android:textColor="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.504"
@@ -123,6 +127,9 @@
         app:layout_constraintTop_toBottomOf="@id/BottomLineView" />
 
     <!-- Button to navigate to registration screen -->
+
+    <!-- Welcome instruction text -->
+
     <Button
         android:id="@+id/RegisterBtn"
         android:layout_width="189dp"
@@ -131,12 +138,13 @@
         android:background="@drawable/neon_blue_button"
         android:text="REGISTER ME"
         android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ForgotPasswordBtn" />
 
-    <!-- Welcome instruction text -->
     <TextView
         android:id="@+id/LoginWelcomeTxt"
         android:layout_width="275dp"
