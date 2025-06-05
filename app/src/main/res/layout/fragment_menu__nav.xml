@@ -7,24 +7,25 @@
     android:background="@drawable/bb_marble"
     tools:context=".Menu_NavFragment">
 
-    <!-- Top banner -->
+    <!-- Top banner image that spans the top of the screen -->
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
-        android:layout_height="130dp"
+        android:layout_height="100dp"
         android:layout_marginTop="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/islamic_label" />
+        app:srcCompat="@drawable/title_banner" />
 
-    <!-- Curved background decoration -->
+
+    <!-- Background curved decorative image to enhance UI -->
     <ImageView
-        android:id="@+id/gradient_curved_bg"
+        android:id="@+id/gradientCurvedBg"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="90dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -34,107 +35,112 @@
         app:srcCompat="@drawable/gradient_curved_bg"
         android:translationZ="-1dp" />
 
-    <!-- Title -->
+    <!-- Title text for the Menu screen -->
     <TextView
         android:id="@+id/Menutxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="MENU"
         android:textColor="@android:color/white"
-        android:textSize="48sp"
+        android:textSize="50sp"
         android:textStyle="bold"
         android:fontFamily="sans-serif-medium"
         android:gravity="center"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="30dp" />
+        android:layout_marginTop="20dp" />
 
-    <!-- Menu Buttons -->
+    <!-- Button to navigate to Pie Chart screen -->
     <Button
         android:id="@+id/viewPieChartBtn"
-        android:layout_width="300dp"
+        android:layout_width="225dp"
         android:layout_height="60dp"
         android:layout_marginTop="40dp"
         android:background="@drawable/pastel_green_blue_gradient"
         android:backgroundTint="@null"
         android:text="VIEW PIE CHART"
-        android:textColor="@android:color/white"
+        android:textColor="@android:color/black"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/Menutxt"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Button to view all recorded expenses -->
     <Button
         android:id="@+id/viewAllExpensesBtn"
-        android:layout_width="300dp"
+        android:layout_width="225dp"
         android:layout_height="60dp"
         android:layout_marginTop="20dp"
         android:background="@drawable/pastel_green_blue_gradient"
         android:backgroundTint="@null"
         android:text="VIEW ALL EXPENSES"
-        android:textColor="@android:color/white"
+        android:textColor="@android:color/black"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/viewPieChartBtn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Button to view daily spending summary -->
     <Button
         android:id="@+id/viewDailySpendingBtn"
-        android:layout_width="300dp"
+        android:layout_width="225dp"
         android:layout_height="60dp"
         android:layout_marginTop="20dp"
         android:background="@drawable/pastel_green_blue_gradient"
         android:backgroundTint="@null"
         android:text="VIEW DAILY SPENDING"
-        android:textColor="@android:color/white"
+        android:textColor="@android:color/black"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/viewAllExpensesBtn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Button to view overall financial progress dashboard -->
     <Button
         android:id="@+id/viewProgressDashboardBtn"
-        android:layout_width="300dp"
+        android:layout_width="225dp"
         android:layout_height="60dp"
         android:layout_marginTop="20dp"
         android:background="@drawable/pastel_green_blue_gradient"
         android:backgroundTint="@null"
         android:text="VIEW PROGRESS DASHBOARD"
-        android:textColor="@android:color/white"
+        android:textColor="@android:color/black"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/viewDailySpendingBtn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Button to manage shared budgeting options -->
     <Button
         android:id="@+id/sharedBudgetingBtn"
-        android:layout_width="300dp"
+        android:layout_width="225dp"
         android:layout_height="60dp"
         android:layout_marginTop="20dp"
         android:background="@drawable/pastel_green_blue_gradient"
         android:backgroundTint="@null"
         android:text="SHARED BUDGETING"
-        android:textColor="@android:color/white"
+        android:textColor="@android:color/black"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/viewProgressDashboardBtn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Button to view or edit budget categories -->
     <Button
         android:id="@+id/categoriesBtn"
-        android:layout_width="300dp"
+        android:layout_width="225dp"
         android:layout_height="60dp"
         android:layout_marginTop="20dp"
         android:background="@drawable/pastel_green_blue_gradient"
         android:backgroundTint="@null"
         android:text="CATEGORIES"
-        android:textColor="@android:color/white"
+        android:textColor="@android:color/black"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/sharedBudgetingBtn"
