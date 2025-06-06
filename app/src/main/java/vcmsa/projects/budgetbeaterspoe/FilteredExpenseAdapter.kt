@@ -11,15 +11,15 @@ import com.bumptech.glide.Glide
 
 // Adapter for displaying a list of filtered expenses in a RecyclerView
 class FilteredExpenseAdapter(
-    private val expenses: List<ExpenseEntity> // List of ExpenseEntity objects passed to the adapter
+    private var expenses: List<ExpenseEntity> // Changed to 'var' to allow re-assignment
 ) : RecyclerView.Adapter<FilteredExpenseAdapter.ViewHolder>() {
 
     // ViewHolder class to hold the views for each item in the RecyclerView
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val name: TextView       = itemView.findViewById(R.id.expenseName) // TextView for expense name
-        val amount: TextView     = itemView.findViewById(R.id.expenseAmount) // TextView for expense amount
-        val date: TextView       = itemView.findViewById(R.id.expenseDate) // TextView for expense date
-        val image: ImageView     = itemView.findViewById(R.id.expenseImage) // ImageView for expense image
+        val name: TextView     = itemView.findViewById(R.id.expenseName) // TextView for expense name
+        val amount: TextView   = itemView.findViewById(R.id.expenseAmount) // TextView for expense amount
+        val date: TextView     = itemView.findViewById(R.id.expenseDate) // TextView for expense date
+        val image: ImageView   = itemView.findViewById(R.id.expenseImage) // ImageView for expense image
     }
 
     // Method to create the ViewHolder and inflate the layout for each item
@@ -48,5 +48,11 @@ class FilteredExpenseAdapter(
     }
 
     // Method to get the total number of items in the expenses list
-    override fun getItemCount(): Int = expenses.size // Return the size of the expenses list
+    override fun getItemCount(): Int = expenses.size
+
+    // NEW METHOD: Allows updating the list of expenses and refreshes the RecyclerView
+    fun updateExpenses(newExpenses: List<ExpenseEntity>) {
+        this.expenses = newExpenses // Update the internal list
+        notifyDataSetChanged() // Notify the adapter that the data set has changed
+    }
 }

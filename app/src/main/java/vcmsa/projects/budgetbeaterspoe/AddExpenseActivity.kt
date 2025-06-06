@@ -28,7 +28,10 @@ class AddExpenseActivity : AppCompatActivity() {
     private var selectedImageUri: Uri? = null
     private val firestore = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
-    private val auth = FirebaseAuth.getInstance() // Added
+    private val auth = FirebaseAuth.getInstance()
+
+    // Map to store category names to Firestore document IDs (needed for the spinner)
+    private var categoryMap = mutableMapOf<String, String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +45,7 @@ class AddExpenseActivity : AppCompatActivity() {
             insets
         }
 
-        loadCategoriesFromFirestore()
+        loadCategoriesFromFirestore() // Load categories specific to the user
 
         binding.uploadImageView.setOnClickListener {
             openImagePicker()
@@ -50,24 +53,39 @@ class AddExpenseActivity : AppCompatActivity() {
 
         binding.SaveBtn.setOnClickListener {
             val expenseName = binding.EXPENSENameInput3.text.toString().trim()
-            val category = binding.CATEGORYSpinner.selectedItem?.toString() ?: ""
+            val categoryName = binding.CATEGORYSpinner.selectedItem?.toString() ?: "" // Get category name
             val date = binding.DATEInput.text.toString().trim()
             val amount = binding.EXPENSEInput3.text.toString().trim().toDoubleOrNull()
             val description = binding.EXPENSEDescriptionInput.text.toString().trim()
-            val userId = auth.currentUser?.uid ?: "" // Added
+            val userId = auth.currentUser?.uid // Get current user's UID
 
-            if (validateInput(expenseName, category, date, amount, description)) {
+            // Get the selected category ID from the map
+            val categoryId = categoryMap[categoryName] // Retrieve the ID based on the name
+
+            if (userId == null) {
+                Toast.makeText(this, "User not logged in.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Ensure a categoryId is found if a categoryName is selected
+            if (categoryId == null && categoryName != "No categories") {
+                Toast.makeText(this, "Could not find category ID. Please try again.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (validateInput(expenseName, categoryName, date, amount, description)) {
                 lifecycleScope.launch {
                     try {
                         val imageUrl = selectedImageUri?.let { uri -> uploadImageToFirebase(uri) }
                         saveExpenseToFirestore(
                             name = expenseName,
-                            category = category,
+                            categoryName = categoryName,
+                            categoryId = categoryId ?: "", // Pass the retrieved categoryId, default to empty if null
                             date = date,
                             amount = amount!!,
                             description = description,
                             imageUrl = imageUrl,
-                            userId = userId // Added
+                            userId = userId
                         )
 
                         withContext(Dispatchers.Main) {
@@ -100,21 +118,35 @@ class AddExpenseActivity : AppCompatActivity() {
     }
 
     private fun loadCategoriesFromFirestore() {
-        val userId = auth.currentUser?.uid ?: return // Added
+        val userId = auth.currentUser?.uid
+        if (userId == null) {
+            Toast.makeText(this, "User not logged in. Cannot load categories.", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         lifecycleScope.launch {
             try {
-                val snapshot = firestore.collection("categories")
-                    .whereEqualTo("userId", userId) // Added filter
+                val snapshot = firestore.collection("users").document(userId).collection("categories")
                     .get().await()
 
-                val categoryNames = snapshot.documents.mapNotNull { it.getString("categoryName") }
+                categoryMap.clear()
+                val categoryNames = mutableListOf<String>()
+
+                for (doc in snapshot.documents) {
+                    val name = doc.getString("categoryName")
+                    if (name != null) {
+                        categoryMap[name] = doc.id // Store name -> ID mapping
+                        categoryNames.add(name)
+                    }
+                }
 
                 if (categoryNames.isNotEmpty()) {
                     val adapter = ArrayAdapter(this@AddExpenseActivity, android.R.layout.simple_spinner_dropdown_item, categoryNames)
                     binding.CATEGORYSpinner.adapter = adapter
                 } else {
                     Toast.makeText(this@AddExpenseActivity, "No categories found. Please add some first.", Toast.LENGTH_SHORT).show()
+                    val emptyAdapter = ArrayAdapter<String>(this@AddExpenseActivity, android.R.layout.simple_spinner_dropdown_item, listOf("No categories"))
+                    binding.CATEGORYSpinner.adapter = emptyAdapter
                 }
             } catch (e: Exception) {
                 Toast.makeText(this@AddExpenseActivity, "Error loading categories: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -150,8 +182,8 @@ class AddExpenseActivity : AppCompatActivity() {
             isValid = false
         } else binding.EXPENSENameInput3.error = null
 
-        if (category.isEmpty() || category == "Select Category") {
-            Toast.makeText(this, "Please select a category", Toast.LENGTH_SHORT).show()
+        if (category.isEmpty() || category == "No categories") {
+            Toast.makeText(this, "Please select a valid category", Toast.LENGTH_SHORT).show()
             isValid = false
         }
 
@@ -182,24 +214,26 @@ class AddExpenseActivity : AppCompatActivity() {
 
     private suspend fun saveExpenseToFirestore(
         name: String,
-        category: String,
+        categoryName: String,
+        categoryId: String?, // Now explicitly nullable String?
         date: String,
         amount: Double,
         description: String,
         imageUrl: String?,
-        userId: String // Added
+        userId: String
     ) {
         val expenseData = hashMapOf(
             "name" to name,
-            "category" to category,
+            "category" to categoryName, // Keep 'category' for the name as per ExpenseEntity
+            "categoryId" to categoryId, // Add 'categoryId' for the ID
             "date" to date,
             "amount" to amount,
             "description" to if (description.isNotEmpty()) description else null,
             "imageUrl" to imageUrl,
-            "userId" to userId // Added
+            "userId" to userId
         )
 
-        firestore.collection("expenses").add(expenseData).await()
+        firestore.collection("users").document(userId).collection("expenses").add(expenseData).await()
     }
 
     companion object {

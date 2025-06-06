@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 // Adapter class for displaying a list of expenses in a RecyclerView
 class ExpenseAdapter(
-    private val expenses: List<ExpenseEntity>, // List of ExpenseEntity objects to be displayed
+    private var expenses: List<ExpenseEntity>, // Changed to 'var' to allow re-assignment
     private val onExpenseSelected: (ExpenseEntity) -> Unit // Lambda function to handle item selection
 ) : RecyclerView.Adapter<ExpenseAdapter.ViewHolder>() {
 
@@ -31,7 +31,7 @@ class ExpenseAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val expense = expenses[position] // Get the expense at the current position
         holder.name.text = expense.name // Set the name of the expense
-        holder.amount.text = "R${expense.amount}" // Set the amount of the expense (formatted as currency)
+        holder.amount.text = "R%.2f".format(expense.amount) // Set the amount of the expense (formatted to 2 decimal places)
         holder.date.text = expense.date // Set the date of the expense
 
         // Set an onClickListener to handle when the item is selected
@@ -42,4 +42,10 @@ class ExpenseAdapter(
 
     // Returns the total number of items in the list
     override fun getItemCount() = expenses.size
+
+    // NEW METHOD: Allows updating the list of expenses and refreshes the RecyclerView
+    fun updateExpenses(newExpenses: List<ExpenseEntity>) {
+        this.expenses = newExpenses // Update the internal list
+        notifyDataSetChanged() // Notify the adapter that the data set has changed
+    }
 }

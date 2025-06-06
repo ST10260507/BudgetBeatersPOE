@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth // Import FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -22,9 +23,10 @@ class ViewExpenses : AppCompatActivity() {
     private lateinit var adapter: FilteredExpenseAdapter
     private lateinit var fromDateInput: EditText
     private lateinit var toDateInput: EditText
-    private var allExpenses = listOf<ExpenseEntity>()
+    private var allExpenses = listOf<ExpenseEntity>() // Stores all expenses for the current user
 
     private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance() // Initialize FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +43,7 @@ class ViewExpenses : AppCompatActivity() {
         setupDatePickers()
         setupRecyclerView()
         setupButtons()
-        loadAllExpenses()
+        loadAllExpenses() // Load all user-specific expenses initially
         setupBottomNav()
     }
 
@@ -53,7 +55,7 @@ class ViewExpenses : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter = FilteredExpenseAdapter(emptyList())
+        adapter = FilteredExpenseAdapter(emptyList()) // Initialize with an empty list
         recyclerView.adapter = adapter
     }
 
@@ -66,7 +68,9 @@ class ViewExpenses : AppCompatActivity() {
                 this,
                 { _, year, month, day ->
                     calendar.set(year, month, day)
-                    editText.setText(dateFormat.format(calendar.time))
+                    // Ensure the date format is consistent with SimpleDateFormat used for parsing
+                    val formattedDate = String.format("%04d-%02d-%02d", year, month + 1, day)
+                    editText.setText(formattedDate)
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
@@ -87,10 +91,11 @@ class ViewExpenses : AppCompatActivity() {
                 Toast.makeText(this, "Please select both dates", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            if (start > end) {
-                Toast.makeText(this, "End date must be after start date", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+            // Date comparison should happen after successful parsing to Date objects
+            // The string comparison `start > end` might work for YYYY-MM-DD but is less reliable
+            // and might lead to unexpected behavior if formats are not strict.
+            // We'll rely on the parsed Date objects for comparison within filterExpenses.
+
             filterExpenses(start, end)
         }
 
@@ -99,22 +104,31 @@ class ViewExpenses : AppCompatActivity() {
         }
     }
 
-    // Load all expenses from Firestore
+    // Load all expenses for the current user from Firestore
     private fun loadAllExpenses() {
-        db.collection("expenses")
+        val userId = auth.currentUser?.uid
+        if (userId == null) {
+            Toast.makeText(this, "User not logged in. Cannot load expenses.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        db.collection("users").document(userId).collection("expenses") // Correct path
             .get()
             .addOnSuccessListener { result ->
                 val tempList = mutableListOf<ExpenseEntity>()
                 for (doc in result) {
                     val expense = doc.toObject(ExpenseEntity::class.java)
-                    tempList.add(expense)
+                    // Ensure the id is set from the document ID
+                    tempList.add(expense.copy(id = doc.id))
                 }
-                allExpenses = tempList
-                adapter = FilteredExpenseAdapter(allExpenses)
-                recyclerView.adapter = adapter
+                allExpenses = tempList // Store all expenses
+                adapter.updateExpenses(allExpenses) // Update the adapter with all expenses
+                if (allExpenses.isEmpty()) {
+                    Toast.makeText(this, "No expenses found for this user.", Toast.LENGTH_SHORT).show()
+                }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Error loading expenses: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Error loading expenses: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -122,34 +136,48 @@ class ViewExpenses : AppCompatActivity() {
     private fun filterExpenses(start: String, end: String) {
         try {
             val inputFmt = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            val startDate = inputFmt.parse(start)!!
-            val endDate = inputFmt.parse(end)!!
+            val startDate = inputFmt.parse(start) // This can return null!
+            val endDate = inputFmt.parse(end)   // This can return null!
 
+            // Check if parsing was successful before proceeding
+            if (startDate == null || endDate == null) {
+                Toast.makeText(this, "Invalid date format. Please select dates using the date picker.", Toast.LENGTH_LONG).show()
+                return
+            }
+
+            // Now perform the date comparison using the parsed Date objects
+            if (startDate.after(endDate)) { // Correct date comparison
+                Toast.makeText(this, "End date must be after start date", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            // Filter expenses from the loaded 'allExpenses' list
             val filtered = allExpenses.filter { exp ->
                 try {
-                    val expDate = inputFmt.parse(exp.date)!!
-                    expDate.time in startDate.time..endDate.time
+                    // Check if expense date is within the selected range
+                    val expDate = inputFmt.parse(exp.date)
+                    // Only include if expDate is not null and is within the range
+                    expDate != null && expDate.time in startDate.time..endDate.time
                 } catch (ex: Exception) {
+                    // Log the exception if needed for debugging, but return false to exclude
                     false
                 }
             }
 
             if (filtered.isEmpty()) {
-                Toast.makeText(this, "No expenses in selected range", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "No expenses found within the selected date range.", Toast.LENGTH_SHORT).show()
             }
-
-            adapter = FilteredExpenseAdapter(filtered)
-            recyclerView.adapter = adapter
+            adapter.updateExpenses(filtered) // Update the adapter with filtered expenses
         } catch (e: Exception) {
-            Toast.makeText(this, "Error filtering expenses: ${e.message}", Toast.LENGTH_SHORT).show()
+            // Catch any other unexpected parsing or filtering errors
+            Toast.makeText(this, "Error filtering expenses: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
         }
     }
 
     private fun showAllExpenses() {
         fromDateInput.text.clear()
         toDateInput.text.clear()
-        adapter = FilteredExpenseAdapter(allExpenses)
-        recyclerView.adapter = adapter
+        adapter.updateExpenses(allExpenses) // Show all loaded expenses
     }
 
     private fun setupBottomNav() {
