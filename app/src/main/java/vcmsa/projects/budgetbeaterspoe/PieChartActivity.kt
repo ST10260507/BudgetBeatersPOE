@@ -50,8 +50,9 @@ class PieChartActivity : AppCompatActivity() {
     private fun setupPieChart() {
         val userId = auth.currentUser?.uid ?: return
 
-        firestore.collection("categories")
-            .whereEqualTo("userId", userId)
+        // Load from user's categories subcollection
+        firestore.collection("users").document(userId)
+            .collection("categories")
             .get()
             .addOnSuccessListener { querySnapshot ->
                 val categories = querySnapshot.documents.map { doc ->

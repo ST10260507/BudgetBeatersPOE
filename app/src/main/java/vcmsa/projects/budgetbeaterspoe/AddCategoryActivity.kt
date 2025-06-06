@@ -49,7 +49,9 @@ class AddCategoryActivity : AppCompatActivity() {
                     "userId" to userId
                 )
 
-                firestore.collection("categories")
+                // Save under user's categories subcollection
+                firestore.collection("users").document(userId)
+                    .collection("categories")
                     .add(categoryData)
                     .addOnSuccessListener {
                         Toast.makeText(

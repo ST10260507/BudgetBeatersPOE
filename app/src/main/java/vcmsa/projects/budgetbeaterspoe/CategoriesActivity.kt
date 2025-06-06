@@ -50,8 +50,9 @@ class CategoriesActivity : AppCompatActivity() {
     private fun loadCategoriesFromFirestore() {
         val userId = auth.currentUser?.uid ?: return
 
-        firestore.collection("categories")
-            .whereEqualTo("userId", userId)
+        // Load from user's categories subcollection
+        firestore.collection("users").document(userId)
+            .collection("categories")
             .get()
             .addOnSuccessListener { result ->
                 val categories = mutableListOf<CategoryEntity>()
@@ -76,24 +77,28 @@ class CategoriesActivity : AppCompatActivity() {
                         .commit()
                     true
                 }
+
                 R.id.Menu -> {
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, Menu_NavFragment())
                         .commit()
                     true
                 }
+
                 R.id.BudgetingGuides -> {
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, BudgetingGuidesFragment())
                         .commit()
                     true
                 }
+
                 R.id.Awards -> {
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, AwardsFragment())
                         .commit()
                     true
                 }
+
                 else -> false
             }
         }
