@@ -30,7 +30,7 @@ class ViewAllSpendingActivity : AppCompatActivity() {
     private lateinit var etFromDate: EditText
     private lateinit var etToDate: EditText
     private val firestore = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance() // Added
+    private val auth = FirebaseAuth.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -128,10 +128,9 @@ class ViewAllSpendingActivity : AppCompatActivity() {
     }
 
     private suspend fun fetchExpensesFromFirestore(): List<ExpenseEntity> {
-        val userId = auth.currentUser?.uid ?: return emptyList() // Added
+        val userId = auth.currentUser?.uid ?: return emptyList()
 
-        val snapshot = firestore.collection("expenses")
-            .whereEqualTo("userId", userId) // Added filter
+        val snapshot = firestore.collection("users").document(userId).collection("expenses")
             .get()
             .await()
 
@@ -140,7 +139,7 @@ class ViewAllSpendingActivity : AppCompatActivity() {
                 ExpenseEntity(
                     id = doc.id,
                     name = doc.getString("name") ?: "",
-                    category = doc.getString("category") ?: "", // Changed to "category"
+                    category = doc.getString("category") ?: "",
                     amount = doc.getDouble("amount") ?: 0.0,
                     date = doc.getString("date") ?: "",
                     userId = doc.getString("userId") ?: "",
@@ -156,15 +155,13 @@ class ViewAllSpendingActivity : AppCompatActivity() {
     private fun filterExpensesByDate(expenses: List<ExpenseEntity>, start: String, end: String): List<ExpenseEntity> {
         return try {
             val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            val dbDateFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
-
             val startDate = sdf.parse(start)!!
             val endDate = sdf.parse(end)!!
 
             expenses.filter { expense ->
                 try {
-                    val expenseDate = dbDateFormat.parse(expense.date)!!
-                    expenseDate in startDate..endDate
+                    val expenseDate = sdf.parse(expense.date)
+                    expenseDate != null && expenseDate.time in startDate.time..endDate.time
                 } catch (e: Exception) {
                     false
                 }
@@ -175,7 +172,6 @@ class ViewAllSpendingActivity : AppCompatActivity() {
     }
 
     private fun displayChartData(expenses: List<ExpenseEntity>) {
-        // Changed to group by "category" instead of "categoryId"
         val categoryMap = expenses.groupBy { it.category }
             .mapValues { it.value.sumOf { exp -> exp.amount } }
 

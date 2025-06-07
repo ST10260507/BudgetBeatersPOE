@@ -8,6 +8,7 @@ data class ExpenseEntity(
     val amount: Double = 0.0,
     val date: String = "",
     val userId: String = "",
-    val imageUrl: String = "",
+//    val imageUrl: String = "",
+    val imageUrl: String? = null,
     val description: String? = null
 )
