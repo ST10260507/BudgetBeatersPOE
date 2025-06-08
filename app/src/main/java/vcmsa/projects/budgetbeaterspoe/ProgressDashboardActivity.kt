@@ -18,6 +18,7 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.auth.FirebaseAuth // Import FirebaseAuth
 import java.io.File
 import java.io.FileOutputStream
 import java.time.LocalDate
@@ -33,6 +34,7 @@ class ProgressDashboardActivity : AppCompatActivity() {
 
     // Firestore instance
     private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance() // Initialize FirebaseAuth
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,6 +88,15 @@ class ProgressDashboardActivity : AppCompatActivity() {
     }
 
     private fun setupPieChartDataForMonth(year: Int, month: Int) {
+        val userId = auth.currentUser?.uid
+        if (userId == null) {
+            Toast.makeText(this, "User not logged in. Cannot load dashboard data.", Toast.LENGTH_SHORT).show()
+            pieChart.clear() // Clear any old data
+            pieChart.setNoDataText("Please log in to view your dashboard.")
+            pieChart.invalidate()
+            return
+        }
+
         val entries = mutableListOf<PieEntry>()
         val colors = mutableListOf<Int>()
 
@@ -94,13 +105,16 @@ class ProgressDashboardActivity : AppCompatActivity() {
             .with(TemporalAdjusters.lastDayOfMonth())
             .toString()
 
-        // Fetch categories first
-        firestore.collection("categories")
+        // Fetch categories first, SPECIFIC TO THE USER
+        firestore.collection("users").document(userId).collection("categories") // CHANGED: user-specific categories
             .get()
             .addOnSuccessListener { categoriesSnapshot ->
 
                 if (categoriesSnapshot.isEmpty) {
-                    Toast.makeText(this, "No categories found", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "No categories found for this user.", Toast.LENGTH_SHORT).show()
+                    pieChart.clear()
+                    pieChart.setNoDataText("No categories found.")
+                    pieChart.invalidate()
                     return@addOnSuccessListener
                 }
 
@@ -108,14 +122,14 @@ class ProgressDashboardActivity : AppCompatActivity() {
                 val categoryDocs = categoriesSnapshot.documents
                 var processedCount = 0
 
-                // For each category, fetch total spending for that month
+                // For each category, fetch total spending for that month, SPECIFIC TO THE USER
                 for (categoryDoc in categoryDocs) {
                     val categoryName = categoryDoc.getString("categoryName") ?: "Unknown"
                     val maxLimit = (categoryDoc.getLong("maxLimit") ?: 0).toInt()
 
-                    // Query expenses for this category between startDate and endDate
-                    firestore.collection("expenses")
-                        .whereEqualTo("categoryName", categoryName)
+                    // Query expenses for this category between startDate and endDate, SPECIFIC TO THE USER
+                    firestore.collection("users").document(userId).collection("expenses") // CHANGED: user-specific expenses
+                        .whereEqualTo("category", categoryName) // Assuming "category" field in expenses for the name
                         .whereGreaterThanOrEqualTo("date", startDate)
                         .whereLessThanOrEqualTo("date", endDate)
                         .get()
@@ -131,15 +145,32 @@ class ProgressDashboardActivity : AppCompatActivity() {
                             processedCount++
                             // When all categories are processed, update pie chart
                             if (processedCount == categoryDocs.size) {
-                                for ((name, spent, max) in spendingData) {
-                                    if (max <= 0) continue
-                                    entries.add(PieEntry(spent, name))
+                                // Filter out categories with 0 spent to avoid showing them in the chart
+                                val dataForChart = spendingData.filter { it.second > 0f }
 
-                                    val percent = (spent / max) * 100
-                                    when {
-                                        percent < 70 -> colors.add(Color.parseColor("#4CAF50")) // Green
-                                        percent in 70.0..100.0 -> colors.add(Color.parseColor("#FFC107")) // Yellow
-                                        else -> colors.add(Color.parseColor("#F44336")) // Red
+                                if (dataForChart.isEmpty()) {
+                                    pieChart.clear()
+                                    pieChart.setNoDataText("No expenses recorded for this month.")
+                                    pieChart.invalidate()
+                                    return@addOnSuccessListener
+                                }
+
+                                for ((name, spent, max) in dataForChart) {
+                                    if (max <= 0) {
+                                        // If maxLimit is 0 or less, we can't calculate percentage,
+                                        // but we still want to show the spending.
+                                        // You might want to handle this differently or display raw spent.
+                                        // For now, if max is 0, we will assume it's still spending.
+                                        entries.add(PieEntry(spent, name))
+                                        colors.add(Color.LTGRAY) // Default color if no limit is set
+                                    } else {
+                                        entries.add(PieEntry(spent, name))
+                                        val percent = (spent / max) * 100
+                                        when {
+                                            percent < 70 -> colors.add(Color.parseColor("#4CAF50")) // Green
+                                            percent <= 100 -> colors.add(Color.parseColor("#FFC107")) // Yellow
+                                            else -> colors.add(Color.parseColor("#F44336")) // Red (Over limit)
+                                        }
                                     }
                                 }
 
@@ -160,12 +191,23 @@ class ProgressDashboardActivity : AppCompatActivity() {
                             }
                         }
                         .addOnFailureListener { e ->
-                            Toast.makeText(this, "Failed to fetch expenses: ${e.message}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "Failed to fetch expenses for category: ${e.message}", Toast.LENGTH_SHORT).show()
+                            processedCount++ // Ensure count increments even on failure
+                            if (processedCount == categoryDocs.size) {
+                                // If all categories processed and failures occurred, update chart
+                                // This might lead to an empty chart if all failed
+                                pieChart.clear()
+                                pieChart.setNoDataText("Error loading expense data.")
+                                pieChart.invalidate()
+                            }
                         }
                 }
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Failed to fetch categories: ${e.message}", Toast.LENGTH_SHORT).show()
+                pieChart.clear()
+                pieChart.setNoDataText("Error loading category data.")
+                pieChart.invalidate()
             }
     }
 
@@ -173,6 +215,12 @@ class ProgressDashboardActivity : AppCompatActivity() {
         val bitmap = pieChart.chartBitmap
         val fileName = "chart_${System.currentTimeMillis()}.png"
         val filePath = getExternalFilesDir(null)?.absolutePath + "/" + fileName
+
+        if (bitmap == null) {
+            Toast.makeText(this, "No chart data to export.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val file = File(filePath)
 
         try {

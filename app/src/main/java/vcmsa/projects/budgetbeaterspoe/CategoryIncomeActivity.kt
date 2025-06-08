@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import com.google.firebase.auth.FirebaseAuth // Import FirebaseAuth
 import java.util.*
 
 // Activity to display and handle category income related operations
@@ -20,6 +21,7 @@ class CategoryIncomeActivity : AppCompatActivity() {
     private lateinit var totalTextView: TextView
 
     private val db = Firebase.firestore
+    private val auth = FirebaseAuth.getInstance() // Initialize FirebaseAuth
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,12 +45,24 @@ class CategoryIncomeActivity : AppCompatActivity() {
     }
 
     private fun loadCategories() {
-        db.collection("categories")
+        val userId = auth.currentUser?.uid // Get the current user's ID
+        if (userId == null) {
+            Toast.makeText(this, "User not logged in. Cannot load categories.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        db.collection("users").document(userId).collection("categories") // Modified to be user-specific
             .get()
             .addOnSuccessListener { result ->
+                // Assuming "categoryName" is the field in your category documents
                 val categoryNames = result.documents.mapNotNull { it.getString("categoryName") }
-                    .distinct()
-                    .sorted()
+                    .distinct() // Ensure unique category names
+                    .sorted() // Sort alphabetically
+
+                if (categoryNames.isEmpty()) {
+                    Toast.makeText(this, "No categories found for this user.", Toast.LENGTH_SHORT).show()
+                    // Optionally, disable the spinner or show a placeholder
+                }
 
                 val adapter = ArrayAdapter(
                     this,
@@ -58,8 +72,8 @@ class CategoryIncomeActivity : AppCompatActivity() {
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 categorySpinner.adapter = adapter
             }
-            .addOnFailureListener {
-                Toast.makeText(this, "Failed to load categories", Toast.LENGTH_SHORT).show()
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to load categories: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -79,17 +93,28 @@ class CategoryIncomeActivity : AppCompatActivity() {
     }
 
     private fun handleSubmission() {
-        val selectedCategory = categorySpinner.selectedItem?.toString() ?: return
+        val selectedCategory = categorySpinner.selectedItem?.toString()
         val fromDate = fromDateInput.text.toString()
         val toDate = toDateInput.text.toString()
+
+        if (selectedCategory.isNullOrBlank()) {
+            Toast.makeText(this, "Please select a category.", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         if (fromDate.isBlank() || toDate.isBlank()) {
             Toast.makeText(this, "Please select both dates.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        db.collection("expenses")
-            .whereEqualTo("categoryName", selectedCategory)
+        val userId = auth.currentUser?.uid
+        if (userId == null) {
+            Toast.makeText(this, "User not logged in. Cannot retrieve data.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        db.collection("users").document(userId).collection("expenses")
+            .whereEqualTo("category", selectedCategory) // <-- CHANGED from "categoryName" to "category"
             .whereGreaterThanOrEqualTo("date", fromDate)
             .whereLessThanOrEqualTo("date", toDate)
             .get()
@@ -98,12 +123,12 @@ class CategoryIncomeActivity : AppCompatActivity() {
                 val display = if (total > 0)
                     "Total Spent: R%.2f".format(total)
                 else
-                    "No expenses found for this period."
+                    "No expenses found for this period in this category."
 
                 totalTextView.text = display
             }
-            .addOnFailureListener {
-                Toast.makeText(this, "Error retrieving data.", Toast.LENGTH_SHORT).show()
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error retrieving data: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
             }
     }
 
