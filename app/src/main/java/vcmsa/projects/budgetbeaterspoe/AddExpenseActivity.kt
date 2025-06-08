@@ -1,13 +1,25 @@
 package vcmsa.projects.budgetbeaterspoe
 
+import android.Manifest
 import android.app.DatePickerDialog
+import android.content.ContentValues
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+
+import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.Base64
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
@@ -15,23 +27,29 @@ import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
 import vcmsa.projects.budgetbeaterspoe.databinding.ActivityAddExpenseBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 import java.util.*
 
 class AddExpenseActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAddExpenseBinding
     private var selectedImageUri: Uri? = null
+    private var cameraImageUri: Uri? = null
     private val firestore = FirebaseFirestore.getInstance()
-    private val storage = FirebaseStorage.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
-    // Map to store category names to Firestore document IDs (needed for the spinner)
+    // Map to store category names to Firestore document IDs
     private var categoryMap = mutableMapOf<String, String>()
+
+    companion object {
+        const val IMAGE_PICK_CODE = 1000
+        const val REQUEST_IMAGE_CAPTURE = 1001
+        const val CAMERA_PERMISSION_REQUEST = 1002
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,30 +63,30 @@ class AddExpenseActivity : AppCompatActivity() {
             insets
         }
 
-        loadCategoriesFromFirestore() // Load categories specific to the user
+        loadCategoriesFromFirestore()
 
         binding.uploadImageView.setOnClickListener {
             openImagePicker()
         }
 
+        binding.btnTakePhoto.setOnClickListener {
+            checkCameraPermission()
+        }
+
         binding.SaveBtn.setOnClickListener {
             val expenseName = binding.EXPENSENameInput3.text.toString().trim()
-            val categoryName = binding.CATEGORYSpinner.selectedItem?.toString() ?: "" // Get category name
+            val categoryName = binding.CATEGORYSpinner.selectedItem?.toString() ?: ""
             val date = binding.DATEInput.text.toString().trim()
             val amount = binding.EXPENSEInput3.text.toString().trim().toDoubleOrNull()
             val description = binding.EXPENSEDescriptionInput.text.toString().trim()
-            val userId = auth.currentUser?.uid // Get current user's UID
-
-            // Get the selected category ID from the map
-            val categoryId = categoryMap[categoryName] // Retrieve the ID based on the name
+            val userId = auth.currentUser?.uid
 
             if (userId == null) {
                 Toast.makeText(this, "User not logged in.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // Ensure a categoryId is found if a categoryName is selected
-            if (categoryId == null && categoryName != "No categories") {
+            if (categoryMap[categoryName] == null && categoryName != "No categories") {
                 Toast.makeText(this, "Could not find category ID. Please try again.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -76,15 +94,19 @@ class AddExpenseActivity : AppCompatActivity() {
             if (validateInput(expenseName, categoryName, date, amount, description)) {
                 lifecycleScope.launch {
                     try {
-                        val imageUrl = selectedImageUri?.let { uri -> uploadImageToFirebase(uri) }
+                        // Convert image to compressed Base64
+                        val base64Image = selectedImageUri?.let { uri ->
+                            compressAndConvertToBase64(uri)
+                        }
+
                         saveExpenseToFirestore(
                             name = expenseName,
                             categoryName = categoryName,
-                            categoryId = categoryId ?: "", // Pass the retrieved categoryId, default to empty if null
+                            categoryId = categoryMap[categoryName] ?: "",
                             date = date,
                             amount = amount!!,
                             description = description,
-                            imageUrl = imageUrl,
+                            base64Image = base64Image,
                             userId = userId
                         )
 
@@ -135,7 +157,7 @@ class AddExpenseActivity : AppCompatActivity() {
                 for (doc in snapshot.documents) {
                     val name = doc.getString("categoryName")
                     if (name != null) {
-                        categoryMap[name] = doc.id // Store name -> ID mapping
+                        categoryMap[name] = doc.id
                         categoryNames.add(name)
                     }
                 }
@@ -147,6 +169,7 @@ class AddExpenseActivity : AppCompatActivity() {
                     Toast.makeText(this@AddExpenseActivity, "No categories found. Please add some first.", Toast.LENGTH_SHORT).show()
                     val emptyAdapter = ArrayAdapter<String>(this@AddExpenseActivity, android.R.layout.simple_spinner_dropdown_item, listOf("No categories"))
                     binding.CATEGORYSpinner.adapter = emptyAdapter
+                    binding.SaveBtn.isEnabled = false
                 }
             } catch (e: Exception) {
                 Toast.makeText(this@AddExpenseActivity, "Error loading categories: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -165,11 +188,27 @@ class AddExpenseActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK && requestCode == IMAGE_PICK_CODE) {
-            data?.data?.let { uri ->
-                selectedImageUri = uri
-                contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                Glide.with(this).load(uri).into(binding.uploadImageView)
+        if (resultCode == RESULT_OK) {
+            when (requestCode) {
+                IMAGE_PICK_CODE -> {
+                    data?.data?.let { uri ->
+                        selectedImageUri = uri
+                        contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        Glide.with(this).load(uri).into(binding.uploadImageView)
+                    }
+                }
+
+                REQUEST_IMAGE_CAPTURE -> {
+                    cameraImageUri?.let {
+                        selectedImageUri = it
+                        Glide.with(this).load(it).into(binding.uploadImageView)
+                    }
+                }
+            }
+        } else {
+            if (requestCode == REQUEST_IMAGE_CAPTURE) {
+                cameraImageUri?.let { contentResolver.delete(it, null, null) }
+                cameraImageUri = null
             }
         }
     }
@@ -205,39 +244,84 @@ class AddExpenseActivity : AppCompatActivity() {
         return isValid
     }
 
-    private suspend fun uploadImageToFirebase(uri: Uri): String {
-        val filename = "expenses_images/${UUID.randomUUID()}"
-        val ref = storage.reference.child(filename)
-        ref.putFile(uri).await()
-        return ref.downloadUrl.await().toString()
+    // Compress image and convert to Base64
+    private fun compressAndConvertToBase64(uri: Uri): String? {
+        return try {
+            // Step 1: Load bitmap with sampling
+            val options = BitmapFactory.Options().apply {
+                inSampleSize = calculateInSampleSize(uri, 800, 800)
+            }
+
+            val inputStream = contentResolver.openInputStream(uri)
+            val bitmap = BitmapFactory.decodeStream(inputStream, null, options)
+            inputStream?.close()
+
+            // Step 2: Compress to JPEG with quality control
+            val outputStream = ByteArrayOutputStream()
+            bitmap?.compress(Bitmap.CompressFormat.JPEG, 70, outputStream)
+            val byteArray = outputStream.toByteArray()
+
+            // Step 3: Check size before encoding
+            if (byteArray.size > 900 * 1024) { // 900KB limit
+                Toast.makeText(this, "Image too large (max 900KB)", Toast.LENGTH_SHORT).show()
+                return null
+            }
+
+            // Convert to Base64
+            Base64.encodeToString(byteArray, Base64.DEFAULT)
+        } catch (e: Exception) {
+            Toast.makeText(this, "Image processing error: ${e.message}", Toast.LENGTH_SHORT).show()
+            null
+        }
+    }
+
+    // Calculate sampling size to reduce memory usage
+    private fun calculateInSampleSize(uri: Uri, reqWidth: Int, reqHeight: Int): Int {
+        val options = BitmapFactory.Options().apply {
+            inJustDecodeBounds = true
+        }
+        contentResolver.openInputStream(uri)?.use {
+            BitmapFactory.decodeStream(it, null, options)
+        }
+
+        val (height: Int, width: Int) = options.run { outHeight to outWidth }
+        var inSampleSize = 1
+
+        if (height > reqHeight || width > reqWidth) {
+            val halfHeight: Int = height / 2
+            val halfWidth: Int = width / 2
+
+            while (halfHeight / inSampleSize >= reqHeight &&
+                halfWidth / inSampleSize >= reqWidth) {
+                inSampleSize *= 2
+            }
+        }
+        return inSampleSize
     }
 
     private suspend fun saveExpenseToFirestore(
         name: String,
         categoryName: String,
-        categoryId: String?, // Now explicitly nullable String?
+        categoryId: String?,
         date: String,
         amount: Double,
         description: String,
-        imageUrl: String?,
+        base64Image: String?,
         userId: String
     ) {
         val expenseData = hashMapOf(
             "name" to name,
-            "category" to categoryName, // Keep 'category' for the name as per ExpenseEntity
-            "categoryId" to categoryId, // Add 'categoryId' for the ID
+            "category" to categoryName,
+            "categoryId" to categoryId,
             "date" to date,
             "amount" to amount,
-            "description" to if (description.isNotEmpty()) description else null,
-            "imageUrl" to imageUrl,
+            "description" to description,
+            "base64Image" to base64Image,  // Store Base64 string
             "userId" to userId
         )
 
-        firestore.collection("users").document(userId).collection("expenses").add(expenseData).await()
-    }
-
-    companion object {
-        const val IMAGE_PICK_CODE = 1000
+        firestore.collection("users").document(userId)
+            .collection("expenses").add(expenseData).await()
     }
 
     private fun setupBottomNav() {
@@ -269,6 +353,87 @@ class AddExpenseActivity : AppCompatActivity() {
                 }
                 else -> false
             }
+        }
+    }
+
+    // Camera functions
+    private fun checkCameraPermission() {
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                dispatchTakePictureIntent()
+            }
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.CAMERA
+            ) -> {
+                Toast.makeText(this, "Camera permission required", Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.CAMERA),
+                    CAMERA_PERMISSION_REQUEST
+                )
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            CAMERA_PERMISSION_REQUEST -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    dispatchTakePictureIntent()
+                } else {
+                    Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun dispatchTakePictureIntent() {
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, "expense_${System.currentTimeMillis()}")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+            }
+        }
+
+        cameraImageUri = contentResolver.insert(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            contentValues
+        )
+
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { intent ->
+            cameraImageUri?.let {
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, it)
+                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
+            } ?: Toast.makeText(this, "Error creating file", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // Fix for the locale warning in date formatting
+    private fun setupDatePicker() {
+        binding.DATEInput.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            val datePickerDialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
+                // FIXED: Added Locale.US to prevent warnings
+                val formattedDate = String.format(Locale.US, "%04d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay)
+                binding.DATEInput.setText(formattedDate)
+            }, year, month, day)
+            datePickerDialog.show()
         }
     }
 }

@@ -229,6 +229,19 @@
         app:layout_constraintHorizontal_bias="0.571"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <Button
+        android:id="@+id/btnTakePhoto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/white_button_border"
+        android:text="TAKE PHOTO"
+        android:textColor="#FF00CC"
+        android:textSize="16sp"
+        app:layout_constraintStart_toEndOf="@id/CATEGORYSpinner"
+        app:layout_constraintTop_toTopOf="@id/CATEGORYSpinner"
+        app:layout_constraintEnd_toStartOf="@+id/uploadImageView" />
+
     <ImageView
         android:id="@+id/uploadImageView"
         android:layout_width="64dp"
@@ -265,7 +278,7 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
