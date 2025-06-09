@@ -24,12 +24,12 @@
         android:id="@+id/ViewExpenses"
         android:layout_width="400dp"
         android:layout_height="60dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="34dp"
         android:fontFamily="sans-serif-medium"
         android:gravity="center"
         android:text="VIEW EXPENSES"
         android:textColor="@android:color/white"
-        android:textSize="38sp"
+        android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.434"
@@ -86,7 +86,7 @@
 
     <EditText
         android:id="@+id/FromDateInput"
-        android:layout_width="175dp"
+        android:layout_width="150dp"
         android:layout_height="40dp"
         android:layout_marginTop="4dp"
         android:background="@drawable/edit_text_bg"
@@ -114,7 +114,7 @@
 
     <EditText
         android:id="@+id/ToDateInput"
-        android:layout_width="175dp"
+        android:layout_width="150dp"
         android:layout_height="40dp"
         android:layout_marginTop="4dp"
         android:background="@drawable/edit_text_bg"
