@@ -264,7 +264,7 @@
         android:scaleType="centerCrop"
         android:src="@drawable/camera"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.65"
+        app:layout_constraintHorizontal_bias="0.7"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/CATEGORYSpinner" />
 
