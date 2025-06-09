@@ -7,41 +7,42 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bb_marble"
-    >
+    android:padding="16dp">
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="100dp"
-        android:layout_marginTop="0dp"
+        android:layout_width="750dp"
+        android:layout_height="320dp"
+        android:layout_marginTop="4dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/title_banner" />
+        app:srcCompat="@drawable/black_squiggle" />
 
     <TextView
         android:id="@+id/BudgetGuides"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="27dp"
+        android:layout_width="306dp"
+        android:layout_height="118dp"
+        android:layout_marginTop="96dp"
         android:fontFamily="sans-serif-medium"
         android:gravity="center"
         android:text="BUDGETING GUIDES"
         android:textColor="@android:color/white"
-        android:textSize="28sp"
+        android:textSize="40sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.342"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/gradientCurvedBg"
-        android:layout_width="492dp"
-        android:layout_height="669dp"
-        android:layout_marginTop="100dp"
+        android:id="@+id/gradient_curved_bg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="120dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.716"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/gradient_curved_bg" />
@@ -50,19 +51,18 @@
         android:id="@+id/GuideMsg"
         android:layout_width="300dp"
         android:layout_height="61dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="136dp"
         android:text="HERE ARE SOME GUIDES TO HELP YOU WITH YOUR BUDGETING:"
         android:textColor="@android:color/white"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.493"
+        app:layout_constraintHorizontal_bias="0.354"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/gradientCurvedBg" />
+        app:layout_constraintTop_toTopOf="@id/gradient_curved_bg" />
 
     <TextView
         android:id="@+id/LinkOne"
-        android:text="https://www.standardbank.co.za/southafrica/personal/learn/personal-budgeting-pointers"
         android:layout_width="323dp"
         android:layout_height="39dp"
         android:layout_marginTop="8dp"
@@ -77,7 +77,6 @@
         android:layout_width="325dp"
         android:layout_height="35dp"
         android:layout_marginTop="16dp"
-        android:text="https://www.nerdwallet.com/article/finance/how-to-budget"
         android:textSize="15sp"
         android:textColor="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
@@ -87,26 +86,25 @@
 
     <TextView
         android:id="@+id/LinkThree"
-        android:layout_width="325dp"
-        android:layout_height="35dp"
-        android:layout_marginTop="16dp"
-        android:text="https://www.moneyhelper.org.uk/en/everyday-money/budgeting/budget-planner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:textSize="15sp"
         android:textColor="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.462"
+        app:layout_constraintHorizontal_bias="0.562"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/LinkTwo" />
 
     <TextView
-        android:layout_width="325dp"
-        android:layout_height="35dp"
-        android:layout_marginTop="16dp"
-        android:text="https://bettermoneyhabits.bankofamerica.com/en/saving-budgeting/creating-a-budget"
+        android:id="@+id/LinkFour"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:textSize="15sp"
         android:textColor="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.462"
+        app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/LinkThree" />
 

@@ -25,7 +25,7 @@
     <!-- LOGIN title text -->
     <TextView
         android:id="@+id/Logintxt"
-        android:text="EMAIL"
+        android:text="LOGIN"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="36dp"
