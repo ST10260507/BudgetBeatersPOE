@@ -11,7 +11,8 @@ Developed by:
 
 GitHub Repository: [Budget Beaters] (https://github.com/VCWVL/prog7313-poe-ST10260507.git)
 
-                - The default branch is: Ankri
+                - The default branch is: Ankri
+
     
 Backup Repository: https://github.com/ST10260507/BudgetBeatersPOE.git
 
@@ -35,7 +36,7 @@ Build APK: https://github.com/ST10145498/Prog7313_BuildAPK_Final.githttps://gith
 
 -   **Shared Budgeting:** Enables multiple users to collaborate on a single budget, facilitating the management of shared expenses and group savings goals.
 -   **Exportable Reports:** Allows users to export financial data in PDF and CSV formats for analysis and sharing. These reports provide detailed summaries of income and expenses, aiding in financial planning and review.
--   **Budgeting Guide:** Provides comprehensive tutorials and tips on effective budgeting techniques, financial planning, and strategies for saving money. 
+-   **Budgeting Guide:** Provides comprehensive tutorials and tips on effective budgeting techniques, financial planning, and strategies for saving money. 
 -   **Budget Pie Chart:** Offers a clear visual representation of spending distribution across different categories, making it easy to understand where money is going.
 
 ## Technologies & Dependencies
@@ -43,9 +44,9 @@ Build APK: https://github.com/ST10145498/Prog7313_BuildAPK_Final.githttps://gith
 Built with Java/Kotlin in Android Studio, leveraging **Google Firebase** for backend services, and utilizing the following libraries:
 
 -   **Google Firebase:**
-    -   **Firebase Authentication:** For user registration, login, and password management.
-    -   **Cloud Firestore:** For secure, scalable, and real-time cloud-based data storage (expenses, categories, user profiles).
-    -   *Other Firebase services (if used, e.g., Storage for images, Analytics for insights):* (Please specify if you use other Firebase services like Storage for images or Analytics)
+    -   **Firebase Authentication:** For user registration, login, and password management.
+    -   **Cloud Firestore:** For secure, scalable, and real-time cloud-based data storage (expenses, categories, user profiles).
+    -   *Other Firebase services (if used, e.g., Storage for images, Analytics for insights):* (Please specify if you use other Firebase services like Storage for images or Analytics)
 -   AndroidX Core, AppCompat, ConstraintLayout, Lifecycle
 -   Navigation Components (fragment.ktx, ui.ktx)
 -   MPAndroidChart for charting (`implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")`)
@@ -93,138 +94,154 @@ Specifically, GitHub Actions are used to:
 * **Automated Builds:** Continuously build the Android application whenever changes are pushed to the repository, ensuring that the codebase remains compilable and functional. This helps in catching integration issues early.
 * **Continuous Integration:** Facilitate a robust continuous integration pipeline, allowing for faster feedback on code changes and improved team collaboration.
 
+**The image showing the Workflows is in the Word Document**
+
 ## Installation Instructions
 
-1.  **Firebase Project Setup:**
-    * Go to the [Firebase Console](https://console.firebase.google.com/) and create a new Firebase project.
-    * Add an Android app to your Firebase project.
-    * Follow the instructions to download your `google-services.json` file and place it in your app module directory (`app/google-services.json`).
-    * Ensure your project-level and app-level `build.gradle` files are configured for Firebase.
+    1.  **Firebase Project Setup:**
+        * Go to the [Firebase Console](https://console.firebase.google.com/) and create a new Firebase project.
+        * Add an Android app to your Firebase project.
+        * Follow the instructions to download your `google-services.json` file and place it in your app module directory (`app/google-services.json`).
+        * Ensure your project-level and app-level `build.gradle` files are configured for Firebase.
+    
+    2.  Clone the repository: `git clone https://github.com/VCWVL/prog7313-poe-ST10260507.git`
+    3.  Open in Android Studio
+    4.  Sync Gradle to install all dependencies
+    5.  Build and run on an emulator or Android device
 
-2.  Clone the repository: `git clone https://github.com/VCWVL/prog7313-poe-ST10260507.git`
-3.  Open in Android Studio
-4.  Sync Gradle to install all dependencies
-5.  Build and run on an emulator or Android device
+    **Running the App:**
 
-    **Running the App:**
+    *Option A: On an Android Emulator*
 
-    *Option A: On an Android Emulator*
+        1.  Click on AVD Manager (top-right toolbar).
+        2.  Create a new virtual device (Pixel 5 or any other).
+        3.  Select an API level (preferably 30 or above).
+        4.  Start the emulator.
+        5.  Click the Run button or press Shift + F10 to deploy the app.
 
-    1.  Click on AVD Manager (top-right toolbar).
-    2.  Create a new virtual device (Pixel 5 or any other).
-    3.  Select an API level (preferably 30 or above).
-    4.  Start the emulator.
-    5.  Click the Run button or press Shift + F10 to deploy the app.
+    *Option B: On a Physical Android Device*
 
-    *Option B: On a Physical Android Device*
-
-    1.  Enable Developer Options and USB Debugging on your Android phone.
-    2.  Connect your phone via USB.
-    3.  Select your device in the Run target list.
-    4.  Run the app.
+        1.  Enable Developer Options and USB Debugging on your Android phone.
+        2.  Connect your phone via USB.
+        3.  Select your device in the Run target list.
+        4.  Run the app.
 
 ## App Functionality (Feature Overview)
 
+### Visual Assets
+
+**The final app icon for Budget Beaters is our distinctive logo, designed to be recognizable and reflect the app's financial theme. Other image assets used throughout the application include various icons for categories, badges, and general user interface elements, all chosen to enhance the user experience and visual appeal.**
+
+Picture of Final App Icon:
+
+    https://github.com/user-attachments/assets/046c2f29-0bf7-4123-bfc4-fe9aabe2397a
+
 ### User Authentication & Onboarding
 
--   **Main Page:** Users swipe to enter.
+-   **Main Page:**
+
+                Users swipe to enter.
+  
 -   **Registration Page:**
-    -   Input: Name, Email, Password, Confirm Password.
-    -   Action: Tap Sign Up to create account (handled by Firebase Authentication).
-    -   Link: Already registered? Login here.
+  
+            -   Input: Name, Email, Password, Confirm Password.
+            -   Action: Tap Sign Up to create account (handled by Firebase Authentication).
+            -   Link: Already registered? Login here.
 -   **Login Page:**
-    -   Input: Email & Password.
-    -   Link: Forgot Password (navigates to the reset page).
+  
+            -   Input: Email & Password.
+            -   Link: Forgot Password (navigates to the reset page).
 -   **Forgot Password Page:**
-    -   Input: Email address.
-    -   Action: Submit to receive reset instructions (handled by Firebase Authentication).
+  
+            -   Input: Email address.
+            -   Action: Submit to receive reset instructions (handled by Firebase Authentication).
 
 ### Navigation & Menu Options
 
--   Upon login, users are directed to the Menu Page.
--   The navigation bar provides access to:
-    -   Logout
-    -   Information Details
-    -   View Awards/Badges
-    -   Return to Main Menu
+    -   Upon login, users are directed to the Menu Page.
+    -   The navigation bar provides access to:
+        -   Logout
+        -   Information Details
+        -   View Awards/Badges
+        -   Return to Main Menu
 
 ### Pie Chart / Graph View
 
--   Features:
-    -   Displays a dynamic pie chart of financial categories.
-    -   Includes a legend with color codes and category percentages.
--   Add Category:
-    -   Input: Name, optional description, minimum and maximum income goals.
-    -   Action: Tap Save to add to the chart (data stored in Cloud Firestore).
--   Delete Category:
-    -   Select a category using a tick box.
-    -   Confirm deletion in a dialog (data updated in Cloud Firestore).
+    -   Features:
+        -   Displays a dynamic pie chart of financial categories.
+        -   Includes a legend with color codes and category percentages.
+    -   Add Category:
+        -   Input: Name, optional description, minimum and maximum income goals.
+        -   Action: Tap Save to add to the chart (data stored in Cloud Firestore).
+    -   Delete Category:
+        -   Select a category using a tick box.
+        -   Confirm deletion in a dialog (data updated in Cloud Firestore).
 
 ### View & Manage Expenses
 
--   Expense Management Features:
-    -   Add Expense
-    -   Remove Expense
-    -   View All Expenses
-    -   View Income by Category
--   Add Expense:
-    -   Input: Name, Amount, Date (using a date picker), Description, Category (selected from a dropdown).
-    -   Optional: Add an image.
-    -   Action: Tap Save (data stored in Cloud Firestore).
--   Remove Expense:
-    -   Select an expense from a list.
-    -   Details are shown in a pop-up.
-    -   Confirm deletion in the pop-up (data updated in Cloud Firestore).
--   View All Expenses:
-    -   Filter Options: Select a date range (From Date and To Date), or view all.
-    -   Displays filtered expenses in a RecyclerView (data fetched from Cloud Firestore).
--   View Income by Category:
-    -   Select From Date, To Date, and a Category.
-    -   Tap Submit to view filtered income stats (data fetched from Cloud Firestore).
+    -   Expense Management Features:
+        -   Add Expense
+        -   Remove Expense
+        -   View All Expenses
+        -   View Income by Category
+    -   Add Expense:
+        -   Input: Name, Amount, Date (using a date picker), Description, Category (selected from a dropdown).
+        -   Optional: Add an image.
+        -   Action: Tap Save (data stored in Cloud Firestore).
+    -   Remove Expense:
+        -   Select an expense from a list.
+        -   Details are shown in a pop-up.
+        -   Confirm deletion in the pop-up (data updated in Cloud Firestore).
+    -   View All Expenses:
+        -   Filter Options: Select a date range (From Date and To Date), or view all.
+        -   Displays filtered expenses in a RecyclerView (data fetched from Cloud Firestore).
+    -   View Income by Category:
+        -   Select From Date, To Date, and a Category.
+        -   Tap Submit to view filtered income stats (data fetched from Cloud Firestore).
 
 ### Daily Spending
 
--   Input: Select a date range (From Date and To Date) or view all.
--   Display: A bar graph illustrating spending trends over time (data fetched from Cloud Firestore).
--   Purpose: To help users monitor their spending against their budget.
+    -   Input: Select a date range (From Date and To Date) or view all.
+    -   Display: A bar graph illustrating spending trends over time (data fetched from Cloud Firestore).
+    -   Purpose: To help users monitor their spending against their budget.
 
 ### Progress Dashboard
 
--   Select a month to view a pie chart indicating budget status:
-    -   Green: Under Budget
-    -   Yellow: Near Limit
-    -   Red: Overspent
--   Categories are labeled with percentages.
--   Option to export pie chart data.
+    -   Select a month to view a pie chart indicating budget status:
+        -   Green: Under Budget
+        -   Yellow: Near Limit
+        -   Red: Overspent
+    -   Categories are labeled with percentages.
+    -   Option to export pie chart data.
 
 ### Shared Budgeting
 
--   Add Members:
-    -   Input: Number of members, names, and emails.
-    -   Action: Tap Submit to invite/add users (data managed in Cloud Firestore).
+    -   Add Members:
+        -   Input: Number of members, names, and emails.
+        -   Action: Tap Submit to invite/add users (data managed in Cloud Firestore).
 
 ### Categories Page
 
--   Displays all financial categories (data fetched from Cloud Firestore).
--   Double-click a category to view related expenses (data fetched from Cloud Firestore).
+    -   Displays all financial categories (data fetched from Cloud Firestore).
+    -   Double-click a category to view related expenses (data fetched from Cloud Firestore).
 
 ### Information Details
 
--   Provides access to guides and tutorials:
-    -   How to use the app
-    -   Financial management tips
+    -   Provides access to guides and tutorials:
+        -   How to use the app
+        -   Financial management tips
 
 ### Awards & Badges
 
--   Displays milestones and achievements, such as:
-    -   Stayed Under Budget for a Week
-    -   Completed 1st Month Without Overspending
-    -   Beat Your Budget for 6 Months
-    -   Reduced Spending in 3 or More Categories
-    -   Paid Off a Major Debt or Loan
-    -   Used Public Transport or Carpooling to Save Money
-    -   Logged All Expenses Correctly for 3+ Months
-    -   Hit All Major Savings Goals for the Year
+    -   Displays milestones and achievements, such as:
+        -   Stayed Under Budget for a Week
+        -   Completed 1st Month Without Overspending
+        -   Beat Your Budget for 6 Months
+        -   Reduced Spending in 3 or More Categories
+        -   Paid Off a Major Debt or Loan
+        -   Used Public Transport or Carpooling to Save Money
+        -   Logged All Expenses Correctly for 3+ Months
+        -   Hit All Major Savings Goals for the Year
 
 ## Changelog
 
